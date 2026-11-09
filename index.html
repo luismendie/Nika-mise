@@ -2919,6 +2919,14 @@ body.caja3[data-view="caja"] .sctools .btn.sct{gap:6px;padding:6px 8px;font-size
 .ob-bal .seg button{font-size:12.5px;padding:9px 6px}
 .lbseg{grid-template-columns:1fr 1fr;margin:4px 0 10px}
 @media (max-width:520px){.prf-t{grid-template-columns:1fr 1fr}.cnt-r{grid-template-columns:40px minmax(0,1fr) 88px}.ob-bal .seg{grid-template-columns:1fr}}
+/* teclado chico del escáner en el celular */
+.nmspad{margin:8px 0 0}
+.nmspad .abc{font-size:14px;letter-spacing:.04em;color:#ffbf66}
+.nmspad .cam{grid-column:1/3;min-height:36px;font-size:14px}
+.nmspad .ok{grid-column:3/5;background:linear-gradient(180deg,#f0604f,#d63a2c);color:#fff;box-shadow:0 3px 0 #8f241b}
+#scan.nmscanro{caret-color:transparent}
+#scan.nmscanro.activo{outline:none}
+.nmpad button{-webkit-tap-highlight-color:transparent}
 
 </style>
 <script>
@@ -4678,6 +4686,29 @@ function layoutCaja(){const vc=$("v-caja"),tp=$("ticketPanel");if(!vc||!tp||!MQ3
 if(MQ3){layoutCaja();(MQ3.addEventListener?MQ3.addEventListener("change",layoutCaja):MQ3.addListener(layoutCaja))}
 /* que la vista de caja nunca quede corrida hacia abajo */
 {const v=document.querySelector(".views");if(v)v.addEventListener("scroll",()=>{if(document.body.dataset.view==="caja"&&window.innerWidth>=1024&&v.scrollTop)v.scrollTop=0})}
+
+/* ---------- celular: teclado chico propio para el escáner (números), con opción de letras para buscar por nombre ---------- */
+{const tactil=window.matchMedia&&matchMedia("(pointer:coarse)").matches;const sc=$("scan"),fm=$("scanform");
+ if(tactil&&sc&&fm){let letras=false;
+  const modoNum=()=>{letras=false;sc.readOnly=true;sc.setAttribute("inputmode","none");sc.classList.add("nmscanro")};modoNum();
+  const pad=document.createElement("div");pad.className="nmpad nmspad";pad.id="nmspad";pad.hidden=true;pad.setAttribute("role","group");pad.setAttribute("aria-label","Teclado para el código");
+  pad.innerHTML=["1","2","3","⌫","4","5","6","0","7","8","9","abc"].map(k=>`<button type="button" data-k="${k}"${k==="⌫"?' aria-label="Borrar un número"':k==="abc"?' aria-label="Buscar por nombre con letras" class="abc"':""}>${k==="abc"?"ABC":k}</button>`).join("")
+   +`<button type="button" class="cam" data-k="cam" aria-label="Escanear con la cámara">Cámara</button><button type="button" class="ok" data-k="ok">Agregar</button>`;
+  fm.after(pad);
+  const cerrarPad=()=>{pad.hidden=true;sc.classList.remove("activo")};
+  sc.addEventListener("click",()=>{if(letras)return;pad.hidden=!pad.hidden;sc.classList.toggle("activo",!pad.hidden)});
+  pad.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;const k=b.dataset.k;
+   if(k==="abc"){cerrarPad();letras=true;sc.readOnly=false;sc.setAttribute("inputmode","search");sc.classList.remove("nmscanro");sc.focus();return}
+   if(k==="cam"){cerrarPad();try{window.abrirLector&&window.abrirLector("vender")}catch(_){}return}
+   if(k==="ok"){if(sc.value.trim()){try{fm.requestSubmit()}catch(_){fm.dispatchEvent(new Event("submit",{cancelable:true,bubbles:true}))}}cerrarPad();return}
+   let v=sc.value;if(k==="⌫")v=v.slice(0,-1);else if(v.length<40)v+=k;sc.value=v});
+  fm.addEventListener("submit",()=>{setTimeout(()=>{if(letras){sc.blur();modoNum()}},0)});
+  sc.addEventListener("blur",()=>{if(letras&&!sc.value)setTimeout(modoNum,150)});
+  /* lector de códigos Bluetooth o USB conectado al celular: escribe aunque el campo sea de solo lectura */
+  document.addEventListener("keydown",e=>{if(letras||document.body.dataset.view!=="caja")return;const a=document.activeElement;
+   if(a&&a!==sc&&a!==document.body&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;if(document.querySelector(".dlg:not([hidden])"))return;
+   if(e.key==="Enter"){if(sc.value.trim()){e.preventDefault();try{fm.requestSubmit()}catch(_){}}return}
+   if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){sc.value+=e.key;e.preventDefault()}else if(e.key==="Backspace"&&a===sc){sc.value=sc.value.slice(0,-1);e.preventDefault()}})}}
 
 /* ---------- alta rápida: escanear un artículo que no está cargado y darlo de alta en el momento ---------- */
 let ultId=0;window.nmNuevoId=()=>{if(NM.nuevoPid)return NM.nuevoPid();let id=Date.now()*100+Math.floor(Math.random()*100);if(id<=ultId)id=ultId+1;ultId=id;return id};
