@@ -4549,7 +4549,7 @@ document.addEventListener("change",e=>{if(e.target.id==="branch")setTimeout(()=>
 
 /* ---------- ticket en 3D: tarjetas con el producto, cantidades en relieve ---------- */
 let tkPrev=0,tkQ={};
-function decorarTicket(){const L=$("lines");if(!L)return;const ls=[...L.querySelectorAll(".line")];if(!ls.length){tkPrev=0;tkQ={};return}
+function decorarTicket(){const L=$("lines");if(!L)return;const ls=[...L.querySelectorAll(".line")];if(!ls.length){tkPrev=0;tkQ={};const b=document.querySelector(".tk-head h2 .tk-n");if(b){b.textContent="0";b.hidden=true}return}
  ls.forEach((el,i)=>{const x=cart[i];if(!x||el.querySelector(".tk-th"))return;let th="";
   if(x.libre){th=`<span class="tk-th libre" aria-hidden="true">${window.__nmLico?window.__nmLico(x.libre.r):""}</span>`}
   else{const p=PRODUCTS.find(y=>y.id===x.id);th=`<span class="tk-th" aria-hidden="true">${p&&window.__nmObjHTML?window.__nmObjHTML(p):""}</span>`}
@@ -4557,6 +4557,9 @@ function decorarTicket(){const L=$("lines");if(!L)return;const ls=[...L.querySel
   const k=String(x.id);if(i>=tkPrev)el.classList.add("nueva");else if(tkQ[k]!=null&&tkQ[k]!==x.q)el.classList.add("cambio")});
  tkPrev=cart.length;tkQ={};cart.forEach(x=>tkQ[String(x.id)]=x.q);
  const h=document.querySelector(".tk-head h2");const n=cart.reduce((a,x)=>a+x.q,0);if(h){let b=h.querySelector(".tk-n");if(!b){b=document.createElement("span");b.className="tk-n";h.appendChild(b)}b.textContent=n;b.hidden=!n}}
+/* Vaciar: limpia el ticket, el pago y el DNI, cierra el ticket en el celular y vuelve al escáner. Se reabre solo al sumar otro producto. */
+{const cl=$("clear");if(cl)cl.addEventListener("click",()=>{try{const p=$("paid");if(p){p.value="";p.dispatchEvent(new Event("input",{bubbles:true}))}const d=$("dni");if(d)d.value="";const h=$("dnihint");if(h)h.textContent=""}catch(e){}
+ document.body.classList.remove("sheet");try{decorarTicket();pintarEfectivo()}catch(e){}toast("Ticket vaciado.");setTimeout(()=>{const s=$("scan");if(s&&document.body.dataset.view==="caja"&&!matchMedia("(pointer:coarse)").matches)s.focus()},50)})}
 if(typeof renderCart==="function"){const rc0=renderCart;window.renderCart=function(){const r=rc0.apply(this,arguments);try{decorarTicket()}catch(e){console.warn(e)}return r}}
 {const L=$("lines");if(L)new MutationObserver(()=>{if(L.querySelector(".line:not(.tk3d)"))try{decorarTicket()}catch(e){}}).observe(L,{childList:true})}
 try{decorarTicket()}catch(e){}
