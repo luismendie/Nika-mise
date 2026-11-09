@@ -3114,8 +3114,8 @@ AB.addEventListener("change",e=>{const t=e.target;
 });
 
 /* ---------- 3) Planes por cantidad de empleados ---------- */
-const PLANES=[{n:"Inicial",hasta:2,precio:50000},{n:"Crecimiento",hasta:5,precio:80000},{n:"Comercio",hasta:10,precio:120000}];
-const EXTRA=10000;
+const PLANES=[{n:"Inicial",hasta:2,precio:29900},{n:"Crecimiento",hasta:5,precio:54900},{n:"Comercio",hasta:10,precio:89900}];
+const EXTRA=5000;
 function precioPlan(emp){emp=Math.max(1,Math.floor(emp||1));const p=PLANES.find(x=>emp<=x.hasta);if(p)return {plan:p.n,precio:p.precio};return {plan:"Empresa",precio:PLANES[PLANES.length-1].precio+(emp-10)*EXTRA}}
 window.precioPlan=precioPlan;
 let empCalc=null;
@@ -3123,7 +3123,7 @@ window.cardPlan=function(){const emp=empCalc||(window.CUENTA&&window.CUENTA.empl
  return `<div class="panel card" id="plancard">${head("Tu plan de Nika Mise","Un solo sistema: caja, stock, vencimientos, avisos y facturas por foto o QR. El precio depende de cuántas personas lo usan.","users")}
  <div class="planes">${PLANES.map((p,i)=>`<div class="plan${r.plan===p.n?" on":""}"><small>${i===0?"1 o 2":(PLANES[i-1].hasta+1)+" a "+p.hasta} empleados</small><b>${p.n}</b><span class="mono">${fmt(p.precio)}<i>/mes</i></span></div>`).join("")}<div class="plan${r.plan==="Empresa"?" on":""}"><small>Más de 10 empleados</small><b>Empresa</b><span class="mono">${fmt(PLANES[2].precio)}<i> + ${fmt(EXTRA)} c/u extra</i></span></div></div>
  <div class="plancalc"><div class="field"><label class="label" for="plan-emp">¿Cuántas personas usan el sistema?</label><input id="plan-emp" type="number" min="1" max="500" step="1" inputmode="numeric" value="${emp}"></div><div class="planres"><small>Te corresponde</small><b>${r.plan}</b><span class="mono">${fmt(r.precio)} por mes</span></div></div>
- <p class="note">Todos los planes incluyen todo: no se cobra aparte por vencimientos ni por cargar facturas. Cuentan los usuarios que entran al sistema (cajeros y encargados).</p></div>`};
+ <p class="note">Todos los planes incluyen todo: no se cobra aparte por vencimientos ni por cargar facturas. Cuentan los usuarios que entran al sistema (cajeros y encargados). Precios finales, sin tope de ventas, productos ni sucursales.</p></div>`};
 AB.addEventListener("input",e=>{if(e.target.id!=="plan-emp")return;const v=parseInt(e.target.value,10);if(!(v>=1&&v<=500))return;empCalc=v;const c=$("plancard");if(!c)return;const tmp=document.createElement("div");tmp.innerHTML=window.cardPlan();c.replaceWith(tmp.firstElementChild);const i=$("plan-emp");if(i){i.focus();const n=String(v).length;try{i.setSelectionRange(n,n)}catch(_){}}});
 
 /* ---------- arranque ---------- */
@@ -3621,7 +3621,7 @@ const ICO={check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
  store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l2-5h14l2 5"/><path d="M4 9v11h16V9"/><path d="M3 9h18M9 20v-6h6v6"/></svg>',
  build:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16"/><path d="M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2"/></svg>'};
 function pasos(){return `<ol class="ob-steps" aria-label="Pasos">${["Tu negocio","Tipo de empresa","Configuración"].map((t,i)=>`<li class="${ob.paso>i+1?"hecho":ob.paso===i+1?"on":""}"><i>${ob.paso>i+1?ICO.check:i+1}</i>${t}</li>`).join("")}</ol>`}
-function cfgLista(){const r=window.precioPlan?window.precioPlan(parseInt(ob.emp,10)||1):{plan:"Inicial",precio:50000};const peq=ob.tipo==="pequena";
+function cfgLista(){const r=window.precioPlan?window.precioPlan(parseInt(ob.emp,10)||1):{plan:"Inicial",precio:29900};const peq=ob.tipo==="pequena";
  return [`Cuenta creada para ${ob.nombre}`,peq?"Caja en modo Pequeña pyme":"Caja en modo Pyme",peq?"Botones sin código: Pan, Facturas, Fiambre, Verduras, Carbón y Varios":"Caja lista para cobrar todo con código","Avisos de vencimientos y stock activados",`Plan ${r.plan}: ${fmt(r.precio)} por mes + IVA`,`Tickets y PDF con el nombre ${ob.nombre} y el logo de Nika`].concat(window.NM&&NM.real?["Copia de seguridad automática en la nube"]:[])}
 function renderOb(){const el=$("obbody");if(!el||!ob)return;
  const logo=`<div class="ob-brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#181b23" stroke="#2a2f3b"></rect><g fill="#eeeae2"><rect x="12" y="15" width="7" height="34" rx="1.5"></rect><rect x="22" y="21" width="4" height="28" rx="1"></rect><rect x="29.5" y="30" width="5" height="19" rx="1"></rect><rect x="38" y="21" width="4" height="28" rx="1"></rect><rect x="45" y="15" width="7" height="34" rx="1.5"></rect></g><rect x="7" y="35" width="50" height="3" rx="1.5" fill="#ffa62e"></rect></svg><div><b>Nika Mise</b><span>Software de gestión creado por Nika</span></div></div>`;
@@ -4114,7 +4114,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){const d=document.ge
 const LEGAL={terminos:{t:"Términos y condiciones",h:`<div class="legal"><p class="note">Última actualización: noviembre de 2026.</p>
 <h4>1. El servicio</h4><p>Nika Mise es un sistema de gestión para comercios: caja, stock, vencimientos, ventas, fiado y reportes. Lo presta Nika (en adelante, «el proveedor») a través de internet, por suscripción mensual.</p>
 <h4>2. Cuenta y acceso</h4><p>Para usar Nika Mise creás una cuenta con un email y una contraseña. Sos responsable de cuidar esos datos y los PIN de tus cajeros. Podés invitar a tu personal a usar la caja; las acciones que hagan quedan registradas.</p>
-<h4>3. Prueba gratis y planes</h4><p>Las cuentas nuevas tienen 15 días de prueba sin costo y sin tarjeta. Después, el precio depende de la cantidad de personas que usan el sistema, según la lista vigente publicada por el proveedor. Los precios no incluyen IVA. Podés dar de baja la suscripción cuando quieras; no hay permanencia mínima.</p>
+<h4>3. Prueba gratis y planes</h4><p>Las cuentas nuevas tienen 15 días de prueba sin costo y sin tarjeta. Después, el precio depende de la cantidad de personas que usan el sistema, según la lista vigente publicada por el proveedor. Los precios publicados son finales: no se suma IVA ni ningún otro cargo. Podés dar de baja la suscripción cuando quieras; no hay permanencia mínima.</p>
 <h4>4. Tus datos son tuyos</h4><p>Los productos, ventas, clientes y demás información que cargás son de tu propiedad. Podés descargarlos en Excel en cualquier momento desde Auto → Cuenta. Si das de baja la cuenta, los conservamos 30 días por si querés volver y después los borramos.</p>
 <h4>5. Facturación electrónica</h4><p>Por ahora, los comprobantes que emite Nika Mise son internos y <b>no son válidos como factura</b>. La facturación electrónica ante ARCA es responsabilidad del comercio hasta que el proveedor habilite esa función.</p>
 <h4>6. Disponibilidad</h4><p>Trabajamos para que el servicio funcione siempre, y la caja sigue funcionando sin internet guardando los cambios en el equipo hasta que vuelve la conexión. Igualmente, el servicio puede tener interrupciones por mantenimiento o fallas de terceros (internet, proveedores de nube).</p>

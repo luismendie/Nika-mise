@@ -4,8 +4,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // Suscripción mensual del plan de Nika Mise con Mercado Pago (cuenta de Nika, no la del negocio).
 // Acciones: suscribir (crea la suscripción y devuelve el link de pago), verificar (consulta el estado
 // directo a Mercado Pago y actualiza el plan) y cancelar. El precio se calcula acá, nunca en el navegador.
-const PLANES = [{ n: "Inicial", hasta: 2, precio: 50000 }, { n: "Crecimiento", hasta: 5, precio: 80000 }, { n: "Comercio", hasta: 10, precio: 120000 }];
-const EXTRA = 10000;
+const PLANES = [{ n: "Inicial", hasta: 2, precio: 29900 }, { n: "Crecimiento", hasta: 5, precio: 54900 }, { n: "Comercio", hasta: 10, precio: 89900 }];
+const EXTRA = 5000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
