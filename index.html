@@ -2563,6 +2563,46 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 .nmvacio b{font-size:17px}.nmvacio .ob-act{justify-content:flex-start;flex-wrap:wrap}
 .seg button.on{background:#eeeae2;color:#14161d}
 
+/* ---------- efectivo: billetes y vuelto en 3D ---------- */
+.nmcash{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.nmc-sug{display:flex;flex-wrap:wrap;gap:8px}
+.nmsug{flex:1 1 90px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-height:52px;padding:8px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,#232733,#181b23);color:var(--muted);font:600 12px var(--f-body);cursor:pointer;box-shadow:0 4px 0 #0c0d12,0 8px 14px -8px rgba(0,0,0,.8);transition:transform .08s,box-shadow .08s}
+.nmsug b{color:var(--ink);font:800 16px var(--f-body);font-variant-numeric:tabular-nums}
+.nmsug.justo{border-color:rgba(76,195,138,.55);background:linear-gradient(180deg,#173a2b,#11291f)}.nmsug.justo b{color:#9be8c0}
+.nmsug:active,.nmbill:active{transform:translateY(3px);box-shadow:0 1px 0 #0c0d12}
+.nmc-bills{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.nmbill{position:relative;min-height:48px;border:0;border-radius:10px;padding:0 4px;color:#fff;font:800 13.5px var(--f-body);cursor:pointer;overflow:hidden;font-variant-numeric:tabular-nums;
+ box-shadow:0 4px 0 rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.2);transition:transform .08s,box-shadow .08s;text-shadow:0 1px 1px rgba(0,0,0,.45)}
+.nmbill::before{content:"";position:absolute;inset:4px;border-radius:7px;border:1px dashed rgba(255,255,255,.35);pointer-events:none}
+.nmbill::after{content:"";position:absolute;right:-10px;top:50%;width:30px;height:30px;margin-top:-15px;border-radius:50%;background:rgba(255,255,255,.16)}
+.nmbill span{position:relative;z-index:1}
+.nmbill.b1000{background:linear-gradient(135deg,#f0a35a,#c26a1e)}.nmbill.b2000{background:linear-gradient(135deg,#5fc2c9,#2a7f8a)}
+.nmbill.b10000{background:linear-gradient(135deg,#6a8fe0,#3150a8)}.nmbill.b20000{background:linear-gradient(135deg,#d77ba6,#9a3866)}
+.nmbill.clr{background:linear-gradient(180deg,#2a2e39,#1c1f28);color:var(--muted);text-shadow:none;font-weight:700}.nmbill.clr::before,.nmbill.clr::after{display:none}
+.nmbill.tap{animation:nmtap .3s ease-out}@keyframes nmtap{40%{transform:translateY(3px) scale(.96)}}
+.nmc-vuelto{border-radius:16px;min-height:0}
+.nmc-vuelto.ok,.nmc-vuelto.falta,.nmc-vuelto.justo{display:flex;flex-direction:column;gap:2px;padding:14px 16px;border:1px solid}
+.nmc-vuelto small{font:800 11px var(--f-body);letter-spacing:.14em;text-transform:uppercase}
+.nmc-n{font-family:var(--f-display);font-weight:900;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.nmc-vuelto.ok{background:linear-gradient(180deg,rgba(76,195,138,.16),rgba(76,195,138,.06));border-color:rgba(76,195,138,.5)}
+.nmc-vuelto.ok small{color:#7ee0ad}.nmc-vuelto.ok .nmc-n{color:#eafff3;text-shadow:0 1px 0 #4cc38a,0 2px 0 #39a873,0 3px 0 #2b8a5c,0 4px 0 #216e49,0 7px 10px rgba(0,0,0,.5)}
+.nmc-vuelto.falta{background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.5)}.nmc-vuelto.falta small{color:#ffb3b3}.nmc-vuelto.falta .nmc-n{color:#ffd6d6;text-shadow:0 2px 0 #b43c3c,0 4px 8px rgba(0,0,0,.5)}
+.nmc-vuelto.justo{background:rgba(255,255,255,.04);border-color:var(--line)}.nmc-vuelto.justo small{color:var(--muted)}.nmc-vuelto.justo .nmc-n{font-size:24px}
+.nmc-dar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px;font-size:13px;color:#c9c6be}
+.nmchip{font-style:normal;font-weight:700;font-size:12.5px;padding:4px 9px;border-radius:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff}
+.nmchip.b1000{background:rgba(240,163,90,.22);border-color:rgba(240,163,90,.5)}.nmchip.b2000{background:rgba(95,194,201,.2);border-color:rgba(95,194,201,.5)}
+.nmchip.b10000{background:rgba(106,143,224,.22);border-color:rgba(106,143,224,.55)}.nmchip.b20000{background:rgba(215,123,166,.22);border-color:rgba(215,123,166,.55)}
+.nmc-ayuda{display:block;font-size:12.5px;color:var(--muted)}
+@media (max-width:420px){.nmc-n{font-size:30px}}
+@media (prefers-reduced-motion:reduce){.nmbill.tap{animation:none}}
+
+.nmbill{white-space:nowrap;font-size:14px}.nmbill em{font-style:normal;font-size:.72em;margin-right:2px;vertical-align:.18em;opacity:.9}
+.nmsug{flex:1 1 0;min-width:0}.nmsug b{white-space:nowrap;font-size:15px}
+.nmcashf{position:relative}
+.nmclr{position:absolute;top:-4px;right:0;min-height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font:700 12.5px var(--f-body);cursor:pointer}
+.nmclr:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+.nmc-vuelto.ok{background:linear-gradient(180deg,#15362a,#0f2219)}.nmc-vuelto.falta{background:#2a1416}.nmc-vuelto.justo{background:#181b23}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -4117,6 +4157,35 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-nm]");if(!
 /* ---------- catálogo vacío: primeros pasos ---------- */
 const rg0=window.renderGrid;window.renderGrid=function(){const r=rg0.apply(this,arguments);try{if(!PRODUCTS.length){const g=$("grid");if(g)g.innerHTML=`<div class="panel card nmvacio"><b>Cargá tus productos para empezar a vender</b><p class="hint">Lo más rápido es importar la lista que ya tenés en Excel. También podés escanear los códigos o cargarlos a mano.</p>
  <div class="ob-act"><button class="btn primary" type="button" data-nm="alta" data-m="excel">Importar desde Excel</button><button class="btn" type="button" data-nm="alta" data-m="codigo">Escanear códigos</button><button class="btn" type="button" data-nm="alta" data-m="manual">Cargar a mano</button></div></div>`}}catch(e){}return r};
+
+
+/* ---------- efectivo: billetes que se tocan y vuelto automático ---------- */
+const BILLETES=[20000,10000,2000,1000,500,200,100,50,20,10];
+const TOCAR=[1000,2000,10000,20000];
+const mil=n=>"$ "+Math.round(n).toLocaleString("es-AR");
+function sugeridos(t){if(!(t>0))return [];const out=new Set();[1000,2000,5000,10000,20000].forEach(m=>{const v=Math.ceil(t/m)*m;if(v>t)out.add(v)});return [...out].sort((a,b)=>a-b).slice(0,2)}
+function desglose(v){const r=[];let x=Math.round(v);BILLETES.forEach(b=>{const n=Math.floor(x/b);if(n>0){r.push([n,b]);x-=n*b}});return {r,resto:x}}
+function armarEfectivo(){const f=$("cashfield");if(!f||document.getElementById("nmcash"))return;const lab=f.querySelector("label");if(lab)lab.textContent="El cliente paga con";
+ const w=document.createElement("div");w.id="nmcash";w.className="nmcash";
+ w.innerHTML=`<div class="nmc-sug" id="nmc-sug" role="group" aria-label="Montos sugeridos"></div>
+ <div class="nmc-bills" role="group" aria-label="Sumar billetes">${TOCAR.map(b=>`<button type="button" class="nmbill b${b}" data-bill="${b}" aria-label="Sumar un billete de ${mil(b)}"><span><em>$</em>${b.toLocaleString("es-AR")}</span></button>`).join("")}</div>
+ <div class="nmc-vuelto" id="nmc-v" aria-live="polite"></div>`;
+ const ch=$("change");if(ch){ch.hidden=true;ch.after(w)}else f.appendChild(w);
+ const clr=document.createElement("button");clr.type="button";clr.className="nmclr";clr.dataset.bill="0";clr.textContent="Borrar";clr.setAttribute("aria-label","Borrar lo que paga el cliente");f.classList.add("nmcashf");f.appendChild(clr);
+ clr.addEventListener("click",()=>{$("paid").value="";updateChange();$("paid").focus()});
+ w.addEventListener("click",e=>{const b=e.target.closest("[data-bill],[data-justo],[data-sug]");if(!b)return;const inp=$("paid");let v=parseFloat(inp.value)||0;
+  if(b.dataset.justo!=null)v=cartTotal();else if(b.dataset.sug)v=+b.dataset.sug;else{const x=+b.dataset.bill;v=x?v+x:0;b.classList.remove("tap");void b.offsetWidth;b.classList.add("tap")}
+  inp.value=v?String(v):"";updateChange()})}
+function pintarEfectivo(){const w=$("nmcash");if(!w)return;const t=cartTotal();const paid=parseFloat($("paid").value)||0;
+ $("nmc-sug").innerHTML=t>0?`<button type="button" class="nmsug justo" data-justo>Paga justo<b>${mil(t)}</b></button>`+sugeridos(t).map(v=>`<button type="button" class="nmsug" data-sug="${v}">Con<b>${mil(v)}</b></button>`).join(""):"";
+ const v=$("nmc-v");if(!t||!paid){v.className="nmc-vuelto";v.innerHTML=t?`<span class="nmc-ayuda">Tocá los billetes que te da el cliente o un monto de arriba.</span>`:"";return}
+ if(paid<t){v.className="nmc-vuelto falta";v.innerHTML=`<small>Faltan</small><b class="nmc-n">${mil(t-paid)}</b>`;return}
+ const vu=paid-t;if(vu<1){v.className="nmc-vuelto justo";v.innerHTML=`<small>Pagó justo</small><b class="nmc-n">Sin vuelto</b>`;return}
+ const d=desglose(vu);v.className="nmc-vuelto ok";
+ v.innerHTML=`<small>Vuelto</small><b class="nmc-n">${mil(vu)}</b><div class="nmc-dar"><span>Dale:</span>${d.r.map(([n,b])=>`<i class="nmchip b${b}">${n} × ${mil(b)}</i>`).join("")}${d.resto?`<i class="nmchip mon">${mil(d.resto)} en monedas</i>`:""}</div>`}
+if(typeof updateChange==="function"){const uc0=updateChange;window.updateChange=function(){const r=uc0.apply(this,arguments);try{armarEfectivo();pintarEfectivo()}catch(e){console.warn(e)}return r}}
+{const cob=document.getElementById("cobrar");if(cob){const l=cob.firstChild;if(l&&l.nodeType===3&&/facturar/.test(l.textContent))l.textContent="Cobrar"}}
+try{armarEfectivo();pintarEfectivo()}catch(e){}
 
 /* ---------- arranque ---------- */
 ponerAyuda();ponerChipCuenta();
