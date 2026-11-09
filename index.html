@@ -2622,6 +2622,36 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 .nmpad button:active{transform:translateY(2px);box-shadow:0 1px 0 #08090c}
 .nmpad .ok{grid-column:1/-1;min-height:34px;background:#eeeae2;color:#14161d;font-size:15px;box-shadow:0 3px 0 #8f8b83}
 
+/* ---------- ticket en 3D ---------- */
+.lines{gap:8px;border-top:0;padding:4px 2px 8px}
+.line.tk3d{grid-template-columns:48px minmax(0,1fr) auto auto;gap:10px;padding:8px 10px 8px 8px;border:1px solid rgba(255,255,255,.08);border-radius:16px;
+ background:linear-gradient(180deg,#1f232d,#171a22);box-shadow:0 3px 0 #0a0b0f,0 10px 18px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06)}
+.line.tk3d .nm{font-weight:700;font-size:14.5px;line-height:1.25}
+.line.tk3d .nm small{font-family:var(--f-body);font-weight:600;font-size:11.5px;margin-top:2px}
+.tk-th{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(150deg,#fdf7ea,#e8ddc8);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 2px 0 #c07412}
+.tk-th .etq-obj{height:56px;margin:0;transform:scale(.6);transform-origin:50% 60%}
+.tk-th .po-floor{display:none}
+.tk-th.libre{background:linear-gradient(150deg,#3a2a12,#2a1f10);color:#ffa62e;box-shadow:inset 0 0 0 1px rgba(255,166,46,.35),0 2px 0 #7a4205}
+.tk-th.libre svg{width:24px;height:24px}
+.line.tk3d .qty{gap:0;padding:3px;border-radius:12px;background:#0d0e13;box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+.line.tk3d .qty button{width:34px;height:34px;border:0;border-radius:9px;font-size:18px;font-weight:800;color:#eeeae2;background:linear-gradient(180deg,#2c313d,#20242e);box-shadow:0 3px 0 #08090c,inset 0 1px 0 rgba(255,255,255,.08);cursor:pointer}
+.line.tk3d .qty button[data-d="1"]{color:#ffbf66}
+.line.tk3d .qty button:active{transform:translateY(2px);box-shadow:0 1px 0 #08090c}
+.line.tk3d .qty span{min-width:30px;font:800 16px var(--f-body);font-variant-numeric:tabular-nums}
+.line.tk3d .sub{min-width:78px;font-family:var(--f-display);font-weight:900;font-size:18px;color:#fff;text-shadow:0 1px 0 #ffb648,0 2px 0 #c07412,0 4px 6px rgba(0,0,0,.45)}
+.line.tk3d.nueva{animation:tkIn .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes tkIn{from{opacity:0;transform:translateY(-8px) scale(.97)}}
+.line.tk3d.cambio .qty span{animation:tkQ .3s ease-out}
+@keyframes tkQ{40%{transform:scale(1.35);color:#ffbf66}}
+.tk-n{display:inline-grid;place-items:center;min-width:24px;height:24px;margin-left:8px;padding:0 6px;border-radius:99px;background:#e5483a;color:#fff;font:800 13px var(--f-body);vertical-align:3px;box-shadow:0 2px 0 #8f241b}
+.tk-head #clear{box-shadow:0 3px 0 #0a0b0f;background:linear-gradient(180deg,#262a35,#1b1e27)}
+.tk-head #clear:active{transform:translateY(2px);box-shadow:0 1px 0 #0a0b0f}
+@media (max-width:420px){.line.tk3d{grid-template-columns:42px minmax(0,1fr) auto;grid-template-areas:"th nm sub" "th qty qty";row-gap:6px}
+ .line.tk3d .tk-th{grid-area:th;width:42px;height:42px;align-self:start}.line.tk3d .nm{grid-area:nm}.line.tk3d .sub{grid-area:sub;align-self:start}.line.tk3d .qty{grid-area:qty;justify-self:start}}
+@media (prefers-reduced-motion:reduce){.line.tk3d.nueva,.line.tk3d.cambio .qty span{animation:none}}
+.tk-th .etq-obj{height:64px;width:72px;flex:none;align-items:center;transform:scale(.56);transform-origin:50% 50%}
+.tk-th .po-disc,.tk-th .po-roll,.tk-th .po-pack{margin-bottom:0}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -3443,6 +3473,7 @@ function objDe(p){if(OBJ_ID[p.id])return OBJ_ID[p.id];const n=(p.n||"").toLowerC
  const k=/agua|jugo|gaseosa|botella|litro|\b1[,.]5 ?l|\b2 ?l/.test(n)?"bottle":/alfajor/.test(n)?"disc":/chicle|beldent|caramelo/.test(n)?"pack":p.r==="Bebidas"?"can":p.r==="Golosinas"?"ball":p.r==="Snacks"?"bag":p.r==="Galletitas"?"roll":"box";
  return [k,c,"#2a2d36","#fbf4e6"]}
 function htmlObj(p){const [k,c1,c2,lab]=objDe(p);return `<span class="etq-obj" aria-hidden="true"><span class="po-floor"></span><span class="po po-${k}" style="--c1:${c1};--c2:${c2};--lab:${lab}"></span></span>`}
+window.__nmObjHTML=p=>htmlObj(p);window.__nmLico=k=>LICO[k]||LICO.otro;
 function pintarEtiquetas(){const g=$("grid");if(!g)return;g.classList.add("etqgrid");
  g.querySelectorAll(".prod").forEach(b=>{if(b.classList.contains("etq"))return;const p=PRODUCTS.find(x=>x.id==b.dataset.id);if(!p)return;
   b.classList.add("etq");if(b.querySelector(".stk.out"))b.classList.add("out");
@@ -4227,6 +4258,21 @@ if(typeof updateChange==="function"){const uc0=updateChange;window.updateChange=
 {const cob=document.getElementById("cobrar");if(cob){const l=cob.firstChild;if(l&&l.nodeType===3&&/facturar/.test(l.textContent))l.textContent="Cobrar"}}
 try{armarEfectivo();lineaCaja();pintarEfectivo()}catch(e){}
 document.addEventListener("change",e=>{if(e.target.id==="branch")setTimeout(()=>{try{lineaCaja();pintarEfectivo()}catch(_){}},0)});
+
+
+/* ---------- ticket en 3D: tarjetas con el producto, cantidades en relieve ---------- */
+let tkPrev=0,tkQ={};
+function decorarTicket(){const L=$("lines");if(!L)return;const ls=[...L.querySelectorAll(".line")];if(!ls.length){tkPrev=0;tkQ={};return}
+ ls.forEach((el,i)=>{const x=cart[i];if(!x||el.querySelector(".tk-th"))return;let th="";
+  if(x.libre){th=`<span class="tk-th libre" aria-hidden="true">${window.__nmLico?window.__nmLico(x.libre.r):""}</span>`}
+  else{const p=PRODUCTS.find(y=>y.id===x.id);th=`<span class="tk-th" aria-hidden="true">${p&&window.__nmObjHTML?window.__nmObjHTML(p):""}</span>`}
+  el.insertAdjacentHTML("afterbegin",th);el.classList.add("tk3d");
+  const k=String(x.id);if(i>=tkPrev)el.classList.add("nueva");else if(tkQ[k]!=null&&tkQ[k]!==x.q)el.classList.add("cambio")});
+ tkPrev=cart.length;tkQ={};cart.forEach(x=>tkQ[String(x.id)]=x.q);
+ const h=document.querySelector(".tk-head h2");const n=cart.reduce((a,x)=>a+x.q,0);if(h){let b=h.querySelector(".tk-n");if(!b){b=document.createElement("span");b.className="tk-n";h.appendChild(b)}b.textContent=n;b.hidden=!n}}
+if(typeof renderCart==="function"){const rc0=renderCart;window.renderCart=function(){const r=rc0.apply(this,arguments);try{decorarTicket()}catch(e){console.warn(e)}return r}}
+{const L=$("lines");if(L)new MutationObserver(()=>{if(L.querySelector(".line:not(.tk3d)"))try{decorarTicket()}catch(e){}}).observe(L,{childList:true})}
+try{decorarTicket()}catch(e){}
 
 /* ---------- arranque ---------- */
 ponerAyuda();ponerChipCuenta();
