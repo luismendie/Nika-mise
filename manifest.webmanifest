@@ -2,6 +2,7 @@
  "name": "Nika Mise",
  "short_name": "Nika Mise",
  "description": "Caja, stock y vencimientos para kioscos, almacenes y comercios.",
+ "id": "/",
  "start_url": "/",
  "scope": "/",
  "display": "standalone",
@@ -26,5 +27,25 @@
    "type": "image/png",
    "purpose": "maskable"
   }
+ ],
+ "screenshots": [
+  {
+   "src": "/shot-wide.jpg",
+   "sizes": "1440x900",
+   "type": "image/jpeg",
+   "form_factor": "wide",
+   "label": "La caja de Nika Mise en la computadora"
+  },
+  {
+   "src": "/shot-narrow.jpg",
+   "sizes": "780x1688",
+   "type": "image/jpeg",
+   "form_factor": "narrow",
+   "label": "Nika Mise en el celular"
+  }
+ ],
+ "categories": [
+  "business",
+  "productivity"
  ]
 }

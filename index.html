@@ -2652,6 +2652,11 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 .tk-th .etq-obj{height:64px;width:72px;flex:none;align-items:center;transform:scale(.56);transform-origin:50% 50%}
 .tk-th .po-disc,.tk-th .po-roll,.tk-th .po-pack{margin-bottom:0}
 
+.hbtn.inst{border-color:rgba(76,195,138,.5);background:rgba(76,195,138,.1)}.hbtn.inst svg{color:#7ee0ad}
+.nminst{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.nminst>div{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line)}
+.nminst span{color:#c9c6be;font-size:13.5px}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -3747,7 +3752,7 @@ function pintarAuth(){const el=pantalla();const tit={entrar:"Entrá a tu negocio
  else if(modoAuth==="sinred")body=`<div class="nma-mail"><p>Para entrar por primera vez en este equipo necesitás internet. Después, la caja funciona aunque se corte.</p><button class="btn primary big" type="button" data-nma="reintentar">Reintentar</button></div>`;
  el.innerHTML=`<div class="nma-card" role="dialog" aria-modal="true" aria-labelledby="nma-t"><div class="nma-brand">${LOGO}<div><b>Nika Mise</b><span>Caja, stock y vencimientos para tu negocio</span></div></div>
   <h1 id="nma-t">${tit}</h1>${msgAuth?`<p class="nma-msg" role="status">${escH(msgAuth)}</p>`:""}${tabs}${body}
-  <div class="nma-pie"><a class="lnk" href="?demo">Probar la demo sin cuenta</a><span>·</span><a class="lnk" href="https://wa.me/${NM.SOPORTE_WA}?text=${encodeURIComponent("Hola, necesito ayuda con Nika Mise")}" target="_blank" rel="noopener">Ayuda por WhatsApp</a><span>·</span><button class="lnk" type="button" data-legal="privacidad">Privacidad</button></div></div>`;
+  <div class="nma-pie"><a class="lnk" href="?demo">Probar la demo sin cuenta</a><span>·</span><a class="lnk" href="https://wa.me/${NM.SOPORTE_WA}?text=${encodeURIComponent("Hola, necesito ayuda con Nika Mise")}" target="_blank" rel="noopener">Ayuda por WhatsApp</a><span>·</span><button class="lnk" type="button" data-legal="privacidad">Privacidad</button><span>·</span><button class="lnk" type="button" data-nminst>Descargar la app</button></div></div>`;
  setTimeout(()=>{const f=el.querySelector("input");if(f&&!f.value)f.focus()},40)}
 NM.pintarAuth=m=>{if(m)modoAuth=m;pintarAuth()};
 const traducir=m=>{m=String(m||"");if(/invalid login|invalid credentials/i.test(m))return "El email o la contraseña no coinciden.";if(/email not confirmed/i.test(m))return "Todavía no confirmaste tu email. Revisá tu casilla.";
@@ -3859,7 +3864,7 @@ const QR_URL=lib("qrcode","https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/q
 function dialogo(titulo,html,opt){opt=opt||{};let d=document.getElementById("nmdlg");
  if(!d){d=document.createElement("div");d.id="nmdlg";d.className="dlg";d.hidden=true;d.innerHTML='<div class="dlg-card" role="dialog" aria-modal="true" aria-labelledby="nmdlg-t"><button class="btn dlg-x" type="button" data-nmx aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="nmdlg-b"></div></div>';document.body.appendChild(d);
   d.addEventListener("click",e=>{if(e.target===d&&!d.dataset.fijo||e.target.closest("[data-nmx]"))cerrarDlg()})}
- d.dataset.fijo=opt.fijo?"1":"";d.querySelector(".dlg-card").classList.toggle("ancho",!!opt.ancho);
+ d.dataset.fijo=opt.fijo?"1":"";d.style.zIndex=document.getElementById("nmauth")?"10050":"";d.querySelector(".dlg-card").classList.toggle("ancho",!!opt.ancho);
  d.querySelector("#nmdlg-b").innerHTML=`<h3 class="dlg-t" id="nmdlg-t">${titulo}</h3>${html}`;d.hidden=false;document.body.classList.add("dlgopen");
  setTimeout(()=>{const f=d.querySelector("#nmdlg-b input,#nmdlg-b select,#nmdlg-b button");if(f)f.focus()},40);NM._dlgCerrar=opt.alCerrar||null;return d}
 function cerrarDlg(){const d=document.getElementById("nmdlg");if(!d||d.hidden)return;d.hidden=true;document.body.classList.remove("dlgopen");const f=NM._dlgCerrar;NM._dlgCerrar=null;if(f)f()}
@@ -4274,8 +4279,30 @@ if(typeof renderCart==="function"){const rc0=renderCart;window.renderCart=functi
 {const L=$("lines");if(L)new MutationObserver(()=>{if(L.querySelector(".line:not(.tk3d)"))try{decorarTicket()}catch(e){}}).observe(L,{childList:true})}
 try{decorarTicket()}catch(e){}
 
+
+/* ---------- instalar como programa en la computadora o el celular ---------- */
+let pedidoInstalar=null;
+const instalada=()=>window.matchMedia&&(matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: window-controls-overlay)").matches)||navigator.standalone;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();pedidoInstalar=e;ponerInstalar()});
+addEventListener("appinstalled",()=>{pedidoInstalar=null;const b=$("nminst");if(b)b.remove();toast("Nika Mise quedó instalada. La encontrás con su ícono en tu computadora.")});
+function ponerInstalar(){if(instalada()||!REAL&&!/vercel\.app|localhost/.test(location.hostname))return;const ctx=document.querySelector(".bar .ctx");if(!ctx||$("nminst"))return;
+ const b=document.createElement("button");b.className="hbtn inst";b.id="nminst";b.type="button";b.setAttribute("aria-label","Descargar e instalar Nika Mise");
+ b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg><span>Descargar app</span>';
+ b.addEventListener("click",instalar);ctx.insertBefore(b,$("nmayuda")||ctx.querySelector(".status"))}
+async function instalar(){if(pedidoInstalar){pedidoInstalar.prompt();try{await pedidoInstalar.userChoice}catch(_){}pedidoInstalar=null;return}
+ const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),mac=/macintosh/i.test(navigator.userAgent)&&!ios,saf=/safari/i.test(navigator.userAgent)&&!/chrome|crios|edg/i.test(navigator.userAgent);
+ dialogo("Descargar Nika Mise",`<p class="hint">Nika Mise se instala como un programa: queda con su ícono, abre en su propia ventana y funciona aunque se corte internet. No ocupa casi espacio y se actualiza sola.</p>
+ <div class="nminst">${ios?`<div><b>iPhone o iPad (Safari)</b><span>Tocá el botón Compartir y elegí «Agregar a inicio».</span></div>`:""}
+ <div><b>Computadora con Windows (Chrome o Edge)</b><span>En la barra de direcciones tocá el ícono de instalar (una pantalla con una flecha) o abrí el menú ⋮ → «Guardar y compartir» → «Instalar Nika Mise».</span></div>
+ <div><b>Mac</b><span>${mac&&saf?"En Safari: menú Archivo → «Agregar al Dock».":"En Chrome: ícono de instalar en la barra de direcciones. En Safari: Archivo → «Agregar al Dock»."}</span></div>
+ <div><b>Android (Chrome)</b><span>Menú ⋮ → «Instalar aplicación».</span></div></div>
+ <div class="ob-act"><span class="hint">Dirección: nika-mise.vercel.app</span><button class="btn primary" type="button" data-nmx>Entendido</button></div>`)}
+NM.instalar=instalar;
+document.addEventListener("click",e=>{if(e.target.closest("[data-nminst]"))instalar()});
+if(/[?&]instalar\b/.test(location.search))setTimeout(()=>{ponerInstalar();if(!pedidoInstalar)instalar()},1500);
+
 /* ---------- arranque ---------- */
-ponerAyuda();ponerChipCuenta();
+ponerAyuda();ponerInstalar();ponerChipCuenta();
 if(REAL){try{const i=$("intro");if(i)i.remove()}catch(e){}permisos();if(altaMode==="foto")altaMode="excel";try{if(invMode==="foto")invMode="qr"}catch(e){}}
 try{renderGrid()}catch(e){}
 })();
