@@ -2598,8 +2598,8 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 
 .nmbill{white-space:nowrap;font-size:14px}.nmbill em{font-style:normal;font-size:.72em;margin-right:2px;vertical-align:.18em;opacity:.9}
 .nmsug{flex:1 1 0;min-width:0}.nmsug b{white-space:nowrap;font-size:15px}
-.nmcashf{position:relative}
-.nmclr{position:absolute;top:-4px;right:0;min-height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font:700 12.5px var(--f-body);cursor:pointer}
+.nmc-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}.nmc-head .label{margin:0}
+.nmclr{min-height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font:700 12.5px var(--f-body);cursor:pointer}
 .nmclr:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
 .nmc-vuelto.ok{background:linear-gradient(180deg,#15362a,#0f2219)}.nmc-vuelto.falta{background:#2a1416}.nmc-vuelto.justo{background:#181b23}
 
@@ -2611,6 +2611,16 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 .nmc-qr{min-height:36px;padding:0 12px;border-radius:9px;border:0;background:#eeeae2;color:#14161d;font:700 13px var(--f-body);cursor:pointer;box-shadow:0 3px 0 #8f8b83}
 .nmc-qr:active{transform:translateY(2px);box-shadow:0 1px 0 #8f8b83}
 .nmc-caja{display:block;margin-top:8px;font-size:12.5px;color:var(--muted)}.nmc-caja b{color:var(--ink)}.nmc-caja.poco b{color:#ffb3b3}
+
+/* campo del monto: sin zoom ni foco molesto en el celular */
+#paid{font-size:16px}
+#paid:focus,#paid.activo{outline:none;border-color:rgba(255,166,46,.55);box-shadow:0 0 0 3px rgba(255,166,46,.12)}
+#paid.nmpaid{cursor:pointer;caret-color:transparent}
+.nmpad{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:8px;padding:6px;border-radius:14px;background:#0d0e13;border:1px solid var(--line)}
+.nmpad[hidden]{display:none}
+.nmpad button{min-height:38px;border:0;border-radius:10px;background:linear-gradient(180deg,#262a35,#1b1e27);color:var(--ink);font:700 18px var(--f-body);box-shadow:0 3px 0 #08090c;cursor:pointer;font-variant-numeric:tabular-nums}
+.nmpad button:active{transform:translateY(2px);box-shadow:0 1px 0 #08090c}
+.nmpad .ok{grid-column:1/-1;min-height:34px;background:#eeeae2;color:#14161d;font-size:15px;box-shadow:0 3px 0 #8f8b83}
 
 </style>
 <script>
@@ -4180,8 +4190,19 @@ function armarEfectivo(){const f=$("cashfield");if(!f||document.getElementById("
  <div class="nmc-bills" role="group" aria-label="Sumar billetes">${TOCAR.map(b=>`<button type="button" class="nmbill b${b}" data-bill="${b}" aria-label="Sumar un billete de ${mil(b)}"><span><em>$</em>${b.toLocaleString("es-AR")}</span></button>`).join("")}</div>
  <div class="nmc-vuelto" id="nmc-v" aria-live="polite"></div>`;
  const ch=$("change");if(ch){ch.hidden=true;ch.after(w)}else f.appendChild(w);
- const clr=document.createElement("button");clr.type="button";clr.className="nmclr";clr.dataset.bill="0";clr.textContent="Borrar";clr.setAttribute("aria-label","Borrar lo que paga el cliente");f.classList.add("nmcashf");f.appendChild(clr);
- clr.addEventListener("click",()=>{$("paid").value="";updateChange();$("paid").focus()});
+ const clr=document.createElement("button");clr.type="button";clr.className="nmclr";clr.textContent="Borrar";clr.setAttribute("aria-label","Borrar lo que paga el cliente");f.classList.add("nmcashf");
+ const hd=document.createElement("div");hd.className="nmc-head";if(lab){lab.before(hd);hd.appendChild(lab)}else f.prepend(hd);hd.appendChild(clr);
+ clr.addEventListener("click",()=>{$("paid").value="";updateChange()});
+ $("paid").addEventListener("input",()=>{try{lineaCaja();pintarEfectivo()}catch(_){}});
+ /* en el celular: teclado numérico chico propio, en vez del teclado del sistema que tapa la pantalla */
+ const tactil=window.matchMedia&&matchMedia("(pointer:coarse)").matches;const inp=$("paid");
+ if(tactil&&inp){inp.readOnly=true;inp.setAttribute("inputmode","none");inp.classList.add("nmpaid");
+  const pad=document.createElement("div");pad.className="nmpad";pad.id="nmpad";pad.hidden=true;pad.setAttribute("role","group");pad.setAttribute("aria-label","Teclado para el monto");
+  pad.innerHTML=["1","2","3","⌫","4","5","6","0","7","8","9","000"].map(k=>`<button type="button" data-k="${k}"${k==="⌫"?' aria-label="Borrar un número"':""}>${k}</button>`).join("")+`<button type="button" class="ok" data-k="ok">Listo</button>`;
+  inp.after(pad);
+  inp.addEventListener("click",()=>{pad.hidden=!pad.hidden;inp.classList.toggle("activo",!pad.hidden)});
+  pad.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;const k=b.dataset.k;let v=inp.value.replace(/\D/g,"");
+   if(k==="ok"){pad.hidden=true;inp.classList.remove("activo");return}if(k==="⌫")v=v.slice(0,-1);else if(v.length<9)v=(v+k).replace(/^0+/,"");inp.value=v;updateChange()})}
  w.addEventListener("click",e=>{const b=e.target.closest("[data-bill],[data-justo],[data-sug]");if(!b)return;const inp=$("paid");let v=parseFloat(inp.value)||0;
   if(b.dataset.justo!=null)v=cartTotal();else if(b.dataset.sug)v=+b.dataset.sug;else{const x=+b.dataset.bill;v=x?v+x:0;b.classList.remove("tap");void b.offsetWidth;b.classList.add("tap")}
   inp.value=v?String(v):"";updateChange()})}
