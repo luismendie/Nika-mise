@@ -2870,6 +2870,14 @@ body.caja3[data-view="caja"] .sctools .btn.sct{gap:6px;padding:6px 8px;font-size
 .gmas b{color:#fff;font-size:14px}
 .ar3-2>.field{min-width:0}
 .ar3 input{width:100%;box-sizing:border-box;min-width:0}
+/* plan pago */
+.nmtrial-b{display:flex;gap:8px;flex-wrap:wrap}
+.plan3{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px 18px;margin:4px 0 12px;border-radius:16px;background:linear-gradient(160deg,#2b2115,#1a160f);border:1px solid rgba(255,166,46,.4);box-shadow:0 5px 0 #07080b,inset 0 1px 0 rgba(255,255,255,.08)}
+.plan3-n{font:800 12px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:#ffbf66}
+.plan3-p{font:900 34px/1.1 var(--f-display);color:#fff;text-shadow:0 1px 0 #ffb648,0 3px 0 #c07412,0 6px 10px rgba(0,0,0,.5)}
+.plan3-p small{font:600 15px var(--f-body);color:var(--muted);text-shadow:none;margin-left:4px}
+.plan3-l{margin:0 0 12px;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:#d9d4ca}
+#planf input{width:100%;box-sizing:border-box}
 
 </style>
 <script>
@@ -3792,7 +3800,7 @@ function deServidor(e){const n=e.negocio||{};const hoy=ymd(Date.now());
  const stock={};suc.forEach(b=>stock[b]={});(e.stock||[]).forEach(s=>{if(!stock[s.sucursal])stock[s.sucursal]={};stock[s.sucursal][Number(s.pid)]=+s.cantidad||0});
  const ventas=(e.ventas||[]).filter(v=>ymd(v.fecha)===hoy).map(v=>{const t=new Date(v.fecha);const o={uid:v.id,b:v.sucursal,c:v.cajero||"",m:v.medio||"Efectivo",total:+v.total||0,items:v.items||[],t:String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0"),nro:+v.nro||0,cli:v.cliente||"",dni:v.dni||"",paid:v.pagado==null?0:+v.pagado,fecha:v.fecha,live:true};if(v.anulacion)o.anul=v.anulacion;return o});
  const docs={};Object.entries(e.docs||{}).forEach(([k,v])=>docs[k]=v&&v.valor);
- return {negocio:{id:n.id,nombre:n.nombre,responsable:n.responsable||"",rubro:n.rubro||"",empleados:n.empleados||1,tipo:n.tipo||"pequena",provincia:n.provincia||"",localidad:n.localidad||"",logo:n.logo||"",plan:n.plan||"prueba",prueba_hasta:n.prueba_hasta,config:n.config||{},creado:n.creado},
+ return {negocio:{id:n.id,nombre:n.nombre,responsable:n.responsable||"",rubro:n.rubro||"",empleados:n.empleados||1,tipo:n.tipo||"pequena",provincia:n.provincia||"",localidad:n.localidad||"",logo:n.logo||"",plan:n.plan||"prueba",prueba_hasta:n.prueba_hasta,plan_estado:n.plan_estado||"prueba",plan_hasta:n.plan_hasta||null,plan_monto:n.plan_monto||null,config:n.config||{},creado:n.creado},
   rol:e.rol||"dueno",sucursales:suc,cajeros:(e.cajeros||[]),productos,stock,lotes:(e.lotes||[]).map(l=>({id:Number(l.pid),b:l.sucursal,q:+l.cantidad,v:String(l.vence).slice(0,10)})),
   ventas,docs,ticketMax:+e.ticket_max||0,mp:!!e.mp,cierres:e.cierres||[],servidor:e.ahora}}
 
@@ -4180,16 +4188,59 @@ if(REAL){
   pedirPin({titulo:`Caja de ${E(nueva)}`,texto:`${E(ok||"")} no está asignado a ${E(nueva)}. Entra alguien de esta sucursal con su PIN.`,quien:CASHIERS[nueva],cancelar:volver,ok:n=>{NM._cajeroOk=n;cashier=n;$("cashier").value=n;NM.rolActivo=NM.rolDe(n);NM.elevado=null;LS.set("nm.cajero."+NM.neg,n);permisos()}})});
 }
 
-/* ---------- prueba gratis ---------- */
-function trial(){if(!REAL||!NM.negocio)return;const n=NM.negocio;let el=document.getElementById("nmtrial");
- if(n.plan&&n.plan!=="prueba"){if(el)el.remove();return}
- const dias=Math.ceil((new Date(n.prueba_hasta).getTime()-Date.now())/864e5);
+/* ---------- prueba gratis y plan pago (suscripción mensual con Mercado Pago) ---------- */
+const fechaCorta=d=>new Date(d).toLocaleDateString("es-AR",{day:"numeric",month:"long"});
+function estadoPlan(){const n=NM.negocio||{};const ahora=Date.now();const hasta=n.plan_hasta?new Date(n.plan_hasta).getTime():0;
+ const diasPrueba=Math.ceil((new Date(n.prueba_hasta).getTime()-ahora)/864e5);
+ if(n.plan_estado==="activo"&&hasta>ahora)return {k:"activo",hasta};
+ if(n.plan_estado==="activo")return {k:"impago",hasta};
+ if((n.plan_estado==="cancelado"||n.plan_estado==="pausado")&&hasta>ahora)return {k:"cancelado",hasta};
+ if(n.plan_estado==="pendiente")return {k:"pendiente",dias:diasPrueba};
+ if(n.plan&&n.plan!=="prueba"&&!n.plan_estado)return {k:"activo",hasta:ahora+864e5};
+ return {k:diasPrueba>0?"prueba":"fin",dias:diasPrueba}}
+NM.estadoPlan=estadoPlan;
+function trial(){if(!REAL||!NM.negocio)return;let el=document.getElementById("nmtrial");const e=estadoPlan();
+ if(e.k==="activo"){if(el)el.remove();return}
  if(!el){el=document.createElement("div");el.id="nmtrial";el.className="nmtrial";const v=document.querySelector(".views");if(!v)return;v.insertBefore(el,v.firstChild)}
  const emp=(window.CUENTA&&window.CUENTA.empleados)||1;const pr=window.precioPlan?window.precioPlan(emp):{plan:"",precio:0};
- const msg=`Hola, quiero activar el plan de Nika Mise para ${(window.CUENTA||{}).nombre||"mi negocio"} (${emp} ${emp===1?"persona":"personas"}).`;
- el.className="nmtrial"+(dias<=0?" fin":dias<=5?" pronto":"");
- el.innerHTML=dias>0?`<span><b>Prueba gratis</b> · te ${dias===1?"queda 1 día":`quedan ${dias} días`}${pr.precio?` · después, plan ${E(pr.plan)} ${fmt(pr.precio)}/mes + IVA`:""}</span><a class="btn" href="${wa(msg)}" target="_blank" rel="noopener">Activar plan</a>`
-  :`<span><b>Tu prueba gratis terminó.</b> La caja sigue andando; activá tu plan para no perder el soporte ni las copias de seguridad.</span><a class="btn primary" href="${wa(msg)}" target="_blank" rel="noopener">Activar plan</a>`}
+ const dueno=NM.rolActivo==="dueno";const btn=(t,p)=>dueno?`<button class="btn${p?" primary":""}" type="button" data-nm="pagarplan">${t}</button>`:`<span class="hint">Avisale al dueño para activar el plan.</span>`;
+ let cls="nmtrial",html="";
+ if(e.k==="prueba"){cls+=e.dias<=5?" pronto":"";html=`<span><b>Prueba gratis</b> · te ${e.dias===1?"queda 1 día":`quedan ${e.dias} días`}${pr.precio?` · después, plan ${E(pr.plan)} ${fmt(pr.precio)}/mes`:""}</span>${btn("Activar plan",e.dias<=5)}`}
+ else if(e.k==="pendiente"){cls+=" pronto";html=`<span><b>Esperando la confirmación de Mercado Pago.</b> Si ya pagaste, puede tardar unos minutos.</span>${dueno?`<span class="nmtrial-b"><button class="btn" type="button" data-nm="verplan">Ya pagué</button><button class="btn primary" type="button" data-nm="pagarplan">Pagar</button></span>`:""}`}
+ else if(e.k==="cancelado"){html=`<span><b>Cancelaste la suscripción.</b> Tu plan sigue activo hasta el ${fechaCorta(e.hasta)}.</span>${btn("Volver a activar")}`}
+ else if(e.k==="impago"){cls+=" fin";html=`<span><b>No pudimos cobrar tu plan.</b> Mercado Pago lo vuelve a intentar; revisá la tarjeta o pagá de nuevo.</span>${btn("Pagar el plan",true)}`}
+ else{cls+=" fin";html=`<span><b>Tu prueba gratis terminó.</b> La caja sigue andando; activá tu plan para no perder el soporte ni las copias de seguridad.</span>${btn("Activar plan",true)}`}
+ el.className=cls;el.innerHTML=html}
+function pagarPlan(){const emp=(window.CUENTA&&window.CUENTA.empleados)||1;const pr=window.precioPlan?window.precioPlan(emp):{plan:"",precio:0};const correo=(NM.correo&&NM.correo())||"";
+ dialogo("Activar tu plan",`<div class="plan3"><span class="plan3-n">Plan ${E(pr.plan)}</span><b class="plan3-p">${fmt(pr.precio)}<small>/mes</small></b><span class="hint">Hasta ${emp} ${emp===1?"persona":"personas"} usando el sistema · todas las sucursales</span></div>
+ <ul class="plan3-l"><li>Se cobra solo cada mes con tu tarjeta o dinero en Mercado Pago.</li><li>Cancelás cuando quieras desde Mi cuenta, sin permanencia.</li><li>Tus datos y tu caja siguen igual: no se pierde nada.</li></ul>
+ <form id="planf" novalidate><div class="field"><label class="label" for="plan-mail">Mail de tu cuenta de Mercado Pago</label><input id="plan-mail" type="email" autocomplete="email" value="${E(correo)}"><small class="hint">Tiene que ser el mismo mail con el que entrás a Mercado Pago.</small></div>
+ <p class="err" id="plan-err" role="alert"></p><div class="pf-act"><button class="btn" type="button" data-nmx>Ahora no</button><button class="btn primary" type="submit" id="plan-go">Ir a Mercado Pago</button></div></form>`);
+ document.getElementById("planf").addEventListener("submit",async ev=>{ev.preventDefault();const er=document.getElementById("plan-err"),go=document.getElementById("plan-go");er.textContent="";
+  if(!navigator.onLine){er.textContent="Necesitás internet para pagar.";return}
+  go.disabled=true;go.textContent="Abriendo Mercado Pago…";
+  try{const {data,error}=await NM.sb().functions.invoke("nm-plan",{body:{accion:"suscribir",negocio:NM.neg,email:document.getElementById("plan-mail").value.trim()}});
+   let msg=data&&data.error;if(error&&!msg){try{const j=await error.context.json();msg=j&&j.error}catch(_){}}
+   if(msg||!data||!data.link){er.innerHTML=E(msg||"No se pudo abrir Mercado Pago.")+` <a href="${wa("Hola, quiero activar el plan de Nika Mise para "+((window.CUENTA||{}).nombre||"mi negocio")+".")}" target="_blank" rel="noopener">Escribinos por WhatsApp</a>`;go.disabled=false;go.textContent="Ir a Mercado Pago";return}
+   NM.negocio.plan_estado="pendiente";try{NM.audit("Suscripción al plan iniciada",{plan:data.plan,monto:data.monto})}catch(_){}
+   location.href=data.link}
+  catch(e){er.textContent="No se pudo abrir Mercado Pago. Revisá internet.";go.disabled=false;go.textContent="Ir a Mercado Pago"}})}
+async function verificarPlan(aviso){if(!REAL||!NM.neg||!navigator.onLine)return;
+ try{const {data}=await NM.sb().functions.invoke("nm-plan",{body:{accion:"verificar",negocio:NM.neg}});if(!data||data.error)return;
+  const antes=NM.negocio.plan_estado;Object.assign(NM.negocio,{plan_estado:data.estado||NM.negocio.plan_estado,plan_hasta:data.hasta||NM.negocio.plan_hasta,plan:data.plan||NM.negocio.plan});trial();
+  if(data.estado==="activo"&&antes!=="activo")dialogo("¡Plan activado!",`<p>Gracias. Tu plan <b>${E(NM.negocio.plan||"")}</b> quedó activo${data.hasta?` y se renueva solo cada mes`:""}.</p><div class="pf-act"><button class="btn primary" type="button" data-nmx>Listo</button></div>`);
+  else if(aviso&&data.estado!=="activo")toast("Mercado Pago todavía no confirmó el pago. Probá en unos minutos.");
+  try{if(document.body.dataset.view==="auto")renderAuto()}catch(_){}}catch(e){}}
+NM.verificarPlan=verificarPlan;
+async function cancelarPlan(){if(!confirm("¿Cancelar la suscripción? Tu plan sigue hasta el final del mes ya pagado y no se te vuelve a cobrar."))return;
+ try{const {data}=await NM.sb().functions.invoke("nm-plan",{body:{accion:"cancelar",negocio:NM.neg}});if(!data||data.error){toast((data&&data.error)||"No se pudo cancelar. Probá de nuevo.");return}
+  NM.negocio.plan_estado="cancelado";try{NM.audit("Suscripción cancelada",null)}catch(_){}trial();try{renderAuto()}catch(_){}toast("Suscripción cancelada.")}catch(e){toast("No se pudo cancelar. Revisá internet.")}}
+/* volver de Mercado Pago o tener un pago pendiente: se consulta el estado real */
+{const q=new URLSearchParams(location.search);const volvio=q.get("plan")==="volver";
+ if(volvio){try{history.replaceState(null,"",location.pathname)}catch(e){}}
+ let tries=0;const chk=()=>{if(!REAL)return;if(!NM.negocio||!NM.neg){if(tries++<40)setTimeout(chk,500);return}
+  const e=estadoPlan();if(volvio||e.k==="pendiente"||e.k==="impago"||(e.k==="activo"&&e.hasta-Date.now()<6*864e5)){verificarPlan(false);if(volvio)setTimeout(()=>verificarPlan(true),8000)}};
+ setTimeout(chk,1200)}
 NM.trial=trial;
 
 /* ---------- impresión térmica ---------- */
@@ -4347,8 +4398,8 @@ function cMiCuenta(){const C=window.CUENTA||{};
  if(!REAL)return `<div class="panel card">${hdr("Estás usando la demo","Los datos son de ejemplo y quedan solo en este equipo.","box")}<div class="ob-act"><a class="btn primary" href="./">Crear mi cuenta gratis</a><button class="btn" type="button" data-nm="reiniciardemo">Reiniciar la demo</button></div></div>`;
  const n=NM.negocio||{};const dias=Math.ceil((new Date(n.prueba_hasta).getTime()-Date.now())/864e5);
  return `<div class="panel card">${hdr("Mi cuenta",`${E(C.nombre||"")} · ${E(NM.correo&&NM.correo()||"")}`,"box")}
- <div class="czg"><div><small>Plan</small><b>${n.plan&&n.plan!=="prueba"?E(n.plan):dias>0?`Prueba gratis · ${dias} días`:"Prueba terminada"}</b></div><div><small>Entró</small><b>${E(cashier||"")}</b></div><div><small>Rol</small><b>${{dueno:"Dueño",encargado:"Encargado",cajero:"Cajero"}[NM.rolActivo]||""}</b></div></div>
- <div class="ob-act"><a class="btn" href="${wa(`Hola, soy de ${C.nombre||"mi negocio"}. Quiero consultar por mi plan de Nika Mise.`)}" target="_blank" rel="noopener">Consultar por el plan</a><button class="btn ghost" type="button" data-nm="salir">Cerrar sesión</button></div></div>`}
+ <div class="czg"><div><small>Plan</small><b>${(()=>{const e=estadoPlan();return e.k==="activo"?`${E(n.plan||"Activo")} · se renueva solo`:e.k==="cancelado"?`${E(n.plan||"")} · hasta el ${fechaCorta(e.hasta)}`:e.k==="pendiente"?"Esperando el pago":e.k==="impago"?"Pago rechazado":dias>0?`Prueba gratis · ${dias} días`:"Prueba terminada"})()}</b></div><div><small>Entró</small><b>${E(cashier||"")}</b></div><div><small>Rol</small><b>${{dueno:"Dueño",encargado:"Encargado",cajero:"Cajero"}[NM.rolActivo]||""}</b></div></div>
+ <div class="ob-act">${NM.rolActivo==="dueno"?(()=>{const e=estadoPlan();return e.k==="activo"?`<button class="btn" type="button" data-nm="cancelarplan">Cancelar suscripción</button>`:`<button class="btn primary" type="button" data-nm="pagarplan">${e.k==="pendiente"?"Pagar el plan":"Activar plan"}</button>`+(e.k==="pendiente"?`<button class="btn" type="button" data-nm="verplan">Ya pagué</button>`:"")})():""}<a class="btn" href="${wa(`Hola, soy de ${C.nombre||"mi negocio"}. Quiero consultar por mi plan de Nika Mise.`)}" target="_blank" rel="noopener">Consultar</a><button class="btn ghost" type="button" data-nm="salir">Cerrar sesión</button></div></div>`}
 function cCajeros(){const lista=REAL?NM.cajeros:Object.entries(CASHIERS).flatMap(([b,c])=>c.map(n=>({nombre:n,rol:"cajero",sucursal:b,activo:true})));const RN={dueno:"Dueño",encargado:"Encargado",cajero:"Cajero"};
  return `<div class="panel card wide">${hdr("Cajeros y permisos","Cada persona entra con su PIN. El cajero vende y ve el stock; el encargado además anula, cambia precios y ve el panel; el dueño ve todo.","box")}
  <div class="arows">${lista.map(c=>`<div class="arow"><span class="ar-m"><b>${E(c.nombre)}${c.activo===false?" · inactivo":""}</b><small>${RN[c.rol]||c.rol} · ${c.sucursal?E(c.sucursal):"Todas las sucursales"}</small></span>${REAL?`<button class="btn" type="button" data-nm="cajedit" data-n="${E(c.nombre)}">Editar</button>`:""}</div>`).join("")}</div>
@@ -4609,6 +4660,7 @@ window.nmAltaRapida=altaRapida;
  if(pareceCodigo(code)){try{beep()}catch(_){}altaRapida(code,{alCerrar:()=>{const s=$("scan");if(s&&document.body.dataset.view==="caja")s.focus()}})}
  else{dialogo("No lo encontramos",`<p class="hint">No hay ningún artículo que se llame «${E(q.slice(0,40))}».</p><div class="pf-act"><button class="btn" type="button" data-nmx>Cerrar</button><button class="btn primary" type="button" data-nm="altanombre" data-n="${E(q.slice(0,60))}">Cargarlo como artículo nuevo</button></div>`)}},true)}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-nm]");if(!b)return;const a=b.dataset.nm;
+ if(a==="pagarplan"){pagarPlan();return}if(a==="verplan"){verificarPlan(true);return}if(a==="cancelarplan"){cancelarPlan();return}
  if(a==="altanombre"){const n=b.dataset.n||"";cerrarDlg();setTimeout(()=>{altaRapida("",{});const i=document.getElementById("ar3-n");if(i){i.value=n;const p=document.getElementById("ar3-p");if(p)p.focus()}},30)}
  else if(a==="altaart"){altaRapida(b.dataset.code||"",{vender:b.dataset.vender!=="0"})}
  else if(a==="plantilla"){plantillaExcel()}});
