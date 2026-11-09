@@ -2603,6 +2603,15 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 .nmclr:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
 .nmc-vuelto.ok{background:linear-gradient(180deg,#15362a,#0f2219)}.nmc-vuelto.falta{background:#2a1416}.nmc-vuelto.justo{background:#181b23}
 
+.nmc-av{margin-top:10px;padding:10px 12px;border-radius:12px;font-size:13.5px;line-height:1.45;color:#eeeae2;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nmc-av b{margin-right:4px}
+.nmc-av.alto{background:#3a1416;border:1px solid rgba(255,107,107,.6)}.nmc-av.alto b{color:#ffb3b3}
+.nmc-av.medio{background:#3a2a10;border:1px solid rgba(232,176,74,.55)}.nmc-av.medio b{color:#f3cf86}
+.nmc-av.bajo{background:rgba(255,255,255,.04);border:1px solid var(--line);color:#c9c6be}
+.nmc-qr{min-height:36px;padding:0 12px;border-radius:9px;border:0;background:#eeeae2;color:#14161d;font:700 13px var(--f-body);cursor:pointer;box-shadow:0 3px 0 #8f8b83}
+.nmc-qr:active{transform:translateY(2px);box-shadow:0 1px 0 #8f8b83}
+.nmc-caja{display:block;margin-top:8px;font-size:12.5px;color:var(--muted)}.nmc-caja b{color:var(--ink)}.nmc-caja.poco b{color:#ffb3b3}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -4182,10 +4191,21 @@ function pintarEfectivo(){const w=$("nmcash");if(!w)return;const t=cartTotal();c
  if(paid<t){v.className="nmc-vuelto falta";v.innerHTML=`<small>Faltan</small><b class="nmc-n">${mil(t-paid)}</b>`;return}
  const vu=paid-t;if(vu<1){v.className="nmc-vuelto justo";v.innerHTML=`<small>Pagó justo</small><b class="nmc-n">Sin vuelto</b>`;return}
  const d=desglose(vu);v.className="nmc-vuelto ok";
- v.innerHTML=`<small>Vuelto</small><b class="nmc-n">${mil(vu)}</b><div class="nmc-dar"><span>Dale:</span>${d.r.map(([n,b])=>`<i class="nmchip b${b}">${n} × ${mil(b)}</i>`).join("")}${d.resto?`<i class="nmchip mon">${mil(d.resto)} en monedas</i>`:""}</div>`}
-if(typeof updateChange==="function"){const uc0=updateChange;window.updateChange=function(){const r=uc0.apply(this,arguments);try{armarEfectivo();pintarEfectivo()}catch(e){console.warn(e)}return r}}
+ v.innerHTML=`<small>Vuelto</small><b class="nmc-n">${mil(vu)}</b><div class="nmc-dar"><span>Dale:</span>${d.r.map(([n,b])=>`<i class="nmchip b${b}">${n} × ${mil(b)}</i>`).join("")}${d.resto?`<i class="nmchip mon">${mil(d.resto)} en monedas</i>`:""}</div>${avisoCambio(vu,paid,t)}`}
+/* aviso de cambio: compara el vuelto con el efectivo que tiene la caja */
+function avisoCambio(vu,paid,t){const caja=Math.max(0,+((typeof cashBox!=="undefined"&&cashBox[branch])||0));const qr=method!=="QR"?`<button type="button" class="nmc-qr" data-nmqr>Cobrar con QR</button>`:"";
+ if(vu>caja)return `<div class="nmc-av alto" role="alert"><b>No te alcanza el cambio.</b> El vuelto es ${mil(vu)} y en la caja hay ${mil(caja)}. Pedile un billete más chico o cobrá con QR.${qr}</div>`;
+ if(vu>caja*0.5&&vu>=2000)return `<div class="nmc-av medio"><b>Ojo con el cambio.</b> Este vuelto se lleva más de la mitad del efectivo de la caja (quedarían ${mil(caja-vu)}). Si tiene un billete más chico, mejor.${qr}</div>`;
+ if(paid>=10000&&t<paid*0.2)return `<div class="nmc-av bajo">Paga con un billete grande por una compra chica. Si tiene uno más chico, cuidás el cambio de la caja.</div>`;
+ return ""}
+document.addEventListener("click",e=>{if(!e.target.closest("[data-nmqr]"))return;const b=document.querySelector('#pay button[data-m="QR"]');if(b){b.click();$("paid").value="";try{updateChange()}catch(_){}toast("Cambiado a QR: el cliente paga con el celular.")}});
+/* en la tarjeta: cuánto cambio hay en la caja */
+function lineaCaja(){const f=$("cashfield");if(!f)return;let el=$("nmc-caja");if(!el){el=document.createElement("span");el.id="nmc-caja";el.className="nmc-caja";const w=$("nmcash");if(w)w.before(el);else return}
+ const caja=Math.max(0,+((typeof cashBox!=="undefined"&&cashBox[branch])||0));el.innerHTML=`Efectivo en la caja de ${NM.esc(branch)}: <b>${mil(caja)}</b>`;el.classList.toggle("poco",caja<5000)}
+if(typeof updateChange==="function"){const uc0=updateChange;window.updateChange=function(){const r=uc0.apply(this,arguments);try{armarEfectivo();lineaCaja();pintarEfectivo()}catch(e){console.warn(e)}return r}}
 {const cob=document.getElementById("cobrar");if(cob){const l=cob.firstChild;if(l&&l.nodeType===3&&/facturar/.test(l.textContent))l.textContent="Cobrar"}}
-try{armarEfectivo();pintarEfectivo()}catch(e){}
+try{armarEfectivo();lineaCaja();pintarEfectivo()}catch(e){}
+document.addEventListener("change",e=>{if(e.target.id==="branch")setTimeout(()=>{try{lineaCaja();pintarEfectivo()}catch(_){}},0)});
 
 /* ---------- arranque ---------- */
 ponerAyuda();ponerChipCuenta();
