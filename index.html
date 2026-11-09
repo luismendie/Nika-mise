@@ -2657,6 +2657,12 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 .nminst>div{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line)}
 .nminst span{color:#c9c6be;font-size:13.5px}
 
+/* usar todo el ancho en monitores grandes */
+@media (min-width:1500px){.views{max-width:none}}
+@media (max-width:1100px){#nmfull span{display:none}}
+@media (min-width:1500px){.pos{grid-template-columns:minmax(0,1fr) 470px}}
+@media (min-width:1800px){.pos{grid-template-columns:minmax(0,1fr) 520px}}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -4301,8 +4307,17 @@ NM.instalar=instalar;
 document.addEventListener("click",e=>{if(e.target.closest("[data-nminst]"))instalar()});
 if(/[?&]instalar\b/.test(location.search))setTimeout(()=>{ponerInstalar();if(!pedidoInstalar)instalar()},1500);
 
+
+/* ---------- pantalla completa (computadora) ---------- */
+function ponerPantalla(){const ctx=document.querySelector(".bar .ctx");if(!ctx||$("nmfull")||!document.documentElement.requestFullscreen)return;if(window.matchMedia&&matchMedia("(pointer:coarse)").matches)return;
+ const b=document.createElement("button");b.className="hbtn";b.id="nmfull";b.type="button";
+ const pinta=()=>{const on=!!document.fullscreenElement;b.setAttribute("aria-label",on?"Salir de pantalla completa":"Pantalla completa");
+  b.innerHTML=(on?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>')+`<span>${on?"Salir":"Pantalla completa"}</span>`};
+ b.addEventListener("click",()=>{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>toast("Tu navegador no deja usar pantalla completa acá. Probá con F11."))});
+ document.addEventListener("fullscreenchange",pinta);pinta();ctx.insertBefore(b,$("nmayuda")||ctx.querySelector(".status"))}
+
 /* ---------- arranque ---------- */
-ponerAyuda();ponerInstalar();ponerChipCuenta();
+ponerAyuda();ponerPantalla();ponerInstalar();ponerChipCuenta();
 if(REAL){try{const i=$("intro");if(i)i.remove()}catch(e){}permisos();if(altaMode==="foto")altaMode="excel";try{if(invMode==="foto")invMode="qr"}catch(e){}}
 try{renderGrid()}catch(e){}
 })();
