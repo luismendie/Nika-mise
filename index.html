@@ -1085,7 +1085,7 @@ a.wabtn{text-decoration:none}
           <span class="kbd hide-m">/</span>
           <button class="btn primary" type="submit">Agregar</button>
         </form>
-        <div class="sctools"><button class="btn sct" type="button" data-lector="vender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Escanear con cámara</span></button><button class="btn sct" type="button" data-lector="precio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span>Ver precio</span></button><button class="btn sct" type="button" data-lector="comparar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span>Comparar precios</span></button></div>
+        <div class="sctools"><button class="btn sct" type="button" data-lector="vender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Escanear con cámara</span></button><button class="btn sct" type="button" data-lector="precio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span>Ver precio</span></button><button class="btn sct" type="button" data-lector="comparar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg><span>Comparar precios</span></button><button class="btn sct" type="button" data-nm="altaart" data-code=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Artículo nuevo</span></button></div>
         <div class="libres" role="group" aria-label="Productos sin código"><span class="label">Sin código</span><button class="lchip" type="button" data-libre="pan">Pan</button><button class="lchip" type="button" data-libre="facturas">Facturas</button><button class="lchip" type="button" data-libre="verduras">Verduras</button><button class="lchip" type="button" data-libre="carbon">Carbón</button><button class="lchip" type="button" data-libre="otro">Otro</button></div>
         <div class="laser" id="laser"><i></i></div>
         <div class="lastscan" id="lastscan"><span class="hint">Pasá un producto por el lector o tocá uno de abajo. Suena el pitido y entra al ticket.</span></div>
@@ -1309,9 +1309,12 @@ function renderCats(){const rs=["Todos",...new Set(PRODUCTS.map(p=>p.r))];
  $("cats").innerHTML=rs.map(r=>`<button type="button" data-c="${r}" aria-pressed="${r===cat}">${r==="Todos"?"":`<i style="background:${CATC[r]||"#9a9ba6"}"></i>`}${r}</button>`).join("");}
 function renderGrid(){
  if(typeof renderCashWarn==="function")renderCashWarn();
- $("grid").innerHTML=PRODUCTS.filter(p=>cat==="Todos"||p.r===cat).map(p=>{const s=stock[branch][p.id];const st=s===0?"out":s<p.min/2?"low":"";const pct=Math.min(100,Math.round(s/(p.min*2)*100));
+ const GLIM=60;let GL=PRODUCTS.filter(p=>cat==="Todos"||p.r===cat);const GTOT=GL.length;
+ /* catálogos grandes (supermercados): en la grilla van los más vendidos; el resto se escanea o se busca */
+ if(GTOT>GLIM){const inC=new Set(cart.map(x=>x.id));GL=GL.slice().sort((a,b)=>(inC.has(b.id)-inC.has(a.id))||((b.w||0)-(a.w||0))).slice(0,GLIM)}
+ $("grid").innerHTML=GL.map(p=>{const s=stock[branch][p.id];const st=s===0?"out":s<p.min/2?"low":"";const pct=Math.min(100,Math.round(s/(p.min*2)*100));
   const lt=lotFor(p.id,branch);const pr=lt&&promoLots.has(lt.i);
-  return `<button type="button" class="prod ${st?"low":""}${lt?" exp":""}" data-id="${p.id}" style="--cc:${CATC[p.r]||"#9a9ba6"}"><span class="ptop"><span class="cat">${p.r}</span>${lt?`<span class="expt${lt.d<=2?" crit":""}">${pr?"−30% · ":""}${lt.d<0?"Vencido":lt.d===0?"Vence hoy":lt.d===1?"Vence mañana":"Vence en "+lt.d+" d"}</span>`:`<span class="stk ${st}">${s} u.</span>`}</span><b>${p.n}</b><span class="bc">${p.bc}</span><span class="pbot"><span class="p">${fmt(p.p)}</span><span class="add" aria-hidden="true">+</span></span><span class="meter"><i style="width:${pct}%"></i></span></button>`}).join("");
+  return `<button type="button" class="prod ${st?"low":""}${lt?" exp":""}" data-id="${p.id}" style="--cc:${CATC[p.r]||"#9a9ba6"}"><span class="ptop"><span class="cat">${p.r}</span>${lt?`<span class="expt${lt.d<=2?" crit":""}">${pr?"−30% · ":""}${lt.d<0?"Vencido":lt.d===0?"Vence hoy":lt.d===1?"Vence mañana":"Vence en "+lt.d+" d"}</span>`:`<span class="stk ${st}">${s} u.</span>`}</span><b>${p.n}</b><span class="bc">${p.bc}</span><span class="pbot"><span class="p">${fmt(p.p)}</span><span class="add" aria-hidden="true">+</span></span><span class="meter"><i style="width:${pct}%"></i></span></button>`}).join("")+(GTOT>GLIM?`<div class="gmas"><b>Mostrando los ${GLIM} más vendidos de ${GTOT.toLocaleString("es-AR")}</b><span>Para el resto, escaneá el código o escribí el nombre arriba.</span></div>`:"");
 }
 function scan(p){
  beep();const l=$("laser");l.classList.remove("hit");void l.offsetWidth;l.classList.add("hit");FX.scan(p.id);
@@ -1995,22 +1998,23 @@ function rowsFromTable(arr){arr=(arr||[]).filter(r=>r&&r.some(c=>String(c??"").t
  if(hi<0)map={n:0,bc:1,r:2,p:3,c:4,st:5,min:6,s:7};
  return arr.slice(hi+1).map(r=>{const g=k=>map[k]!=null?r[map[k]]:"";return {n:String(g("n")??"").trim(),bc:String(g("bc")??"").replace(/\.0+$/,"").replace(/\s/g,""),r:String(g("r")??"").trim(),p:pnum(g("p")),c:pnum(g("c")),st:pnum(g("st")),min:pnum(g("min")),s:String(g("s")??"").trim()}}).filter(o=>o.n||o.p>0)}
 function parseDelim(t){const lines=t.replace(/\r/g,"").split("\n").filter(l=>l.trim());if(!lines.length)return[];const h=lines[0];const d=h.includes("\t")?"\t":(h.split(";").length>=h.split(",").length?";":",");return lines.map(l=>l.split(d).map(x=>x.replace(/^"|"$/g,"").trim()))}
-function classify(rows){return rows.map(o=>{const ex=o.bc&&PRODUCTS.find(x=>x.bc===o.bc);const err=!o.n?"Falta el nombre":!(o.p>0)?"Falta el precio de venta":"";return {...o,status:err?"err":ex?"upd":"new",err}})}
-function upsertProduct(o){let p=o.bc&&PRODUCTS.find(x=>x.bc===o.bc);
+function classify(rows){const ix=new Map(PRODUCTS.map(x=>[x.bc,x]));const vistos=new Set();return rows.map(o=>{const ex=o.bc&&(ix.get(o.bc)||vistos.has(o.bc));if(o.bc)vistos.add(o.bc);const err=!o.n?"Falta el nombre":!(o.p>0)?"Falta el precio de venta":"";return {...o,status:err?"err":ex?"upd":"new",err}})}
+let IDX=null;
+function upsertProduct(o){let p=o.bc&&(IDX?IDX.get(o.bc):PRODUCTS.find(x=>x.bc===o.bc));
  if(p){p.n=o.n||p.n;if(o.p>0)p.p=Math.round(o.p);if(o.c>0)p.c=Math.round(o.c);if(o.r)p.r=o.r;if(o.s)p.s=o.s;if(o.min>0)p.min=Math.round(o.min);if(o.st>=0)stock[branch][p.id]=Math.round(o.st);return {p,nuevo:false}}
- const id=Math.max(0,...PRODUCTS.map(x=>x.id))+1;const min=o.min>0?Math.round(o.min):10;
- p={id,n:o.n,bc:o.bc||("200"+String(id).padStart(10,"0")),r:o.r||"Varios",p:Math.round(o.p),min,c:o.c>0?Math.round(o.c):Math.round(o.p*.65/10)*10,s:o.s||"Sin proveedor",w:Math.max(5,Math.round(min*1.5))};
+ const id=window.nmNuevoId();const min=o.min>0?Math.round(o.min):10;
+ p={id,n:o.n,bc:o.bc||window.nmCodigoInterno(),r:o.r||"Varios",p:Math.round(o.p),min,c:o.c>0?Math.round(o.c):Math.round(o.p*.65/10)*10,s:o.s||"Sin proveedor",w:Math.max(5,Math.round(min*1.5))};
  PRODUCTS.push(p);const st=o.st>=0?Math.round(o.st):0;BRANCHES.forEach(b=>stock[b][id]=st);return {p,nuevo:true}}
 function afterCatalog(){renderCats();renderGrid();renderStock();try{$("rubro").innerHTML=["Todos",...new Set(PRODUCTS.map(p=>p.r))].map(r=>`<option>${r}</option>`).join("")}catch(e){}}
 function setPrev(src,rows){altaBusy=false;altaImg=null;if(!rows.length){toast("No encontramos productos. Revisá que el archivo tenga una fila de títulos.");renderAlta();return}altaPrev={src,rows:classify(rows)};renderAlta();$("stAlta").scrollIntoView({behavior:"smooth",block:"start"})}
 function fakeRead(msg,src,rows){altaBusy=msg;renderAlta();setTimeout(()=>setPrev(src,rows.map(x=>({...x}))),1500)}
-function loadXLSX(){return window.XLSX?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement("script");sc.src="/lib/xlsx.full.min.js";sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)})}
+function loadXLSX(){return window.XLSX?Promise.resolve():new Promise((ok,no)=>{const sc=document.createElement("script");sc.src=(window.NM_LIB&&window.NM_LIB.xlsx)||"/lib/xlsx.full.min.js";sc.onload=ok;sc.onerror=no;document.head.appendChild(sc)})}
 async function readFile(f){altaBusy="Leyendo "+f.name+"…";renderAlta();
  try{let arr;if(/\.(csv|txt)$/i.test(f.name))arr=parseDelim(await f.text());
   else{await loadXLSX();const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});arr=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:""})}
   setPrev("Excel · "+f.name,rowsFromTable(arr))}
  catch(e){altaBusy=false;toast("No se pudo leer el archivo. Guardalo como .xlsx o .csv y probá de nuevo.");renderAlta()}}
-function doImport(){const R=altaPrev.rows.filter(x=>x.status!=="err");let n=0,u=0;R.forEach(o=>{const r=upsertProduct(o);r.nuevo?n++:u++;altaRecent.unshift(r.p.n)});altaPrev=null;afterCatalog();renderAlta();toast(`${n} ${n===1?"producto dado":"productos dados"} de alta${u?` y ${u} actualizados`:""}`)}
+function doImport(){const R=altaPrev.rows.filter(x=>x.status!=="err");let n=0,u=0;IDX=new Map(PRODUCTS.map(x=>[x.bc,x]));try{R.forEach(o=>{const r=upsertProduct(o);if(r.nuevo&&r.p.bc)IDX.set(r.p.bc,r.p);r.nuevo?n++:u++;altaRecent.unshift(r.p.n)})}finally{IDX=null}altaRecent=altaRecent.slice(0,30);altaPrev=null;afterCatalog();renderAlta();toast(`${n} ${n===1?"producto dado":"productos dados"} de alta${u?` y ${u} actualizados`:""}`)}
 
 const EXCEL_DEMO=[["Producto","Código de barras","Rubro","Precio de venta","Costo","Stock","Mínimo","Proveedor"],
  ["Chicle de menta","7790000000301","Golosinas","$ 600","380","50","20","Distribuidora Golomax"],
@@ -2039,7 +2043,7 @@ function prevHTML(){const R=altaPrev.rows,nN=R.filter(x=>x.status==="new").lengt
 function altaBody(){
  if(altaBusy)return `<div class="drop reading-on">${altaImg?`<img src="${altaImg}" alt="Imagen cargada">`:`<span class="drop-ic">${aic("spark")}</span>`}<b>${esc(altaBusy)}</b><span class="hint">Detectando productos, códigos y precios</span><div class="reading"><i class="go"></i></div></div>`;
  if(altaPrev)return prevHTML();
- if(altaMode==="excel")return `<div class="drop"><span class="drop-ic">${XLSSVG}</span><b>Importá tu lista de productos desde Excel</b><span class="hint">Archivos .xlsx, .xls o .csv. Las columnas se detectan solas.</span><div class="drop-act"><label class="btn primary" for="al-file" style="cursor:pointer">Subir Excel</label><input id="al-file" type="file" accept=".xlsx,.xls,.csv,.txt" hidden><button class="btn" type="button" data-al="xdemo">Usar Excel de ejemplo</button></div></div>
+ if(altaMode==="excel")return `<div class="drop"><span class="drop-ic">${XLSSVG}</span><b>Importá tu lista de productos desde Excel</b><span class="hint">Archivos .xlsx, .xls o .csv. Las columnas se detectan solas. Sirve para listas de miles de artículos: supermercados y pymes cargan todo de una vez.</span><div class="drop-act"><label class="btn primary" for="al-file" style="cursor:pointer">Subir Excel</label><input id="al-file" type="file" accept=".xlsx,.xls,.csv,.txt" hidden><button class="btn" type="button" data-nm="plantilla">Descargar plantilla</button><button class="btn" type="button" data-al="xdemo">Usar Excel de ejemplo</button></div></div>
   <div class="colsg"><small>Columnas que reconoce (solo Producto y Precio son obligatorias)</small><div>${HDRS.map((h,i)=>`<span class="${i===0||i===3?"req":""}">${h}</span>`).join("")}</div><button class="btn ghost" type="button" data-al="copyhdr">Copiar estos títulos para armar tu Excel</button></div>
   <details class="wadet"><summary>O pegá las celdas directo desde Excel</summary><textarea id="al-paste" rows="5" aria-label="Celdas pegadas desde Excel" placeholder="Seleccioná las filas en Excel (con la fila de títulos), copiá y pegá acá"></textarea><button class="btn" type="button" data-al="paste" style="margin-top:8px">Revisar lo pegado</button></details>`;
  if(altaMode==="foto")return `<div class="drop"><span class="drop-ic">${aic("camera")}</span><b>Sacale una foto a la góndola, a tu lista de precios o al cuaderno</b><span class="hint">La IA reconoce los productos y sus precios, y vos revisás antes de guardar.</span><div class="drop-act"><label class="btn primary" for="al-foto" style="cursor:pointer">Sacar o subir foto</label><input id="al-foto" type="file" accept="image/*" capture="environment" hidden><button class="btn" type="button" data-al="fdemo">Usar foto de ejemplo</button></div></div><p class="note">En el prototipo la lectura usa productos de ejemplo; en la versión real se leen de tu foto.</p>`;
@@ -2785,6 +2789,87 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 }
 @media (prefers-reduced-motion:reduce){.avt,.av3d .avi-a .btn{transition:none}}
 
+/* =====================================================================
+   CAPA 3D GENERAL: tarjetas con canto, botones que se hunden, campos
+   hundidos, íconos biselados. Sin inclinaciones ni filtros (no desenfoca).
+   ===================================================================== */
+:root{--e3:#07080b;--hi3:inset 0 1px 0 rgba(255,255,255,.07)}
+.panel{border-color:rgba(255,255,255,.075);box-shadow:0 5px 0 var(--e3),0 22px 36px -22px rgba(0,0,0,.95),var(--hi3)}
+.ktile{background:linear-gradient(180deg,#1e222c,#15171e);border-color:rgba(255,255,255,.075);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 5px 0 var(--e3),0 18px 28px -18px rgba(0,0,0,.95),var(--hi3)}
+.kic{background:linear-gradient(160deg,rgba(255,180,80,.26),rgba(255,140,30,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 rgba(0,0,0,.55)}
+.ktile.warn .kic{background:linear-gradient(160deg,rgba(240,166,58,.3),rgba(240,166,58,.08))}
+.ktile.bad .kic{background:linear-gradient(160deg,rgba(229,72,58,.32),rgba(229,72,58,.08))}
+.kv{font-weight:900;text-shadow:0 1px 0 rgba(255,182,72,.55),0 2px 0 rgba(120,70,10,.8),0 4px 8px rgba(0,0,0,.5)}
+.ktile.warn .kv{text-shadow:0 1px 0 #7a4a08,0 3px 6px rgba(0,0,0,.5)}.ktile.bad .kv{text-shadow:0 1px 0 #6a1a12,0 3px 6px rgba(0,0,0,.5)}
+.vtitle{text-shadow:0 2px 0 rgba(0,0,0,.6),0 6px 14px rgba(0,0,0,.45)}
+
+/* botones */
+.btn{background:linear-gradient(180deg,#2a2e39,#1f222b);border-color:rgba(255,255,255,.09);box-shadow:0 3px 0 var(--e3),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .08s,box-shadow .08s,border-color .2s}
+.btn:hover:not(:disabled){border-color:rgba(255,166,46,.45)}
+.btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--e3),inset 0 1px 0 rgba(255,255,255,.05)}
+.btn.primary{background:linear-gradient(180deg,#f0604f,#d63a2c);border-color:#e5483a;box-shadow:0 3px 0 #8f241b,0 10px 20px -10px rgba(229,72,58,.9),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn.primary:active:not(:disabled){box-shadow:0 1px 0 #8f241b,inset 0 1px 0 rgba(255,255,255,.2)}
+.btn:disabled{box-shadow:0 2px 0 var(--e3)}
+.btn.cobrar{background:linear-gradient(180deg,#f36452,#d4392b);box-shadow:0 6px 0 #9c2a20,0 18px 30px -14px rgba(229,72,58,.95),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn.cobrar:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #9c2a20,inset 0 1px 0 rgba(255,255,255,.2)}
+.dlg-x{box-shadow:0 2px 0 var(--e3),inset 0 1px 0 rgba(255,255,255,.08)}
+
+/* campos hundidos */
+select,input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea{background-color:rgba(0,0,0,.42);box-shadow:inset 0 2px 5px rgba(0,0,0,.55),0 1px 0 rgba(255,255,255,.05)}
+.sel{box-shadow:0 3px 0 var(--e3),var(--hi3);background:linear-gradient(180deg,#1f222b,#181a21)}
+.sel select{box-shadow:none;background-color:transparent}
+
+/* navegación lateral y de abajo */
+.tab{transition:transform .08s,box-shadow .12s,background .12s,color .12s}
+.tab:hover:not([aria-selected="true"]){background:rgba(255,255,255,.04)}
+.tab[aria-selected="true"]{background:linear-gradient(180deg,rgba(229,72,58,.28),rgba(229,72,58,.12));box-shadow:inset 0 0 0 1px rgba(229,72,58,.6),0 3px 0 #5e1811,0 10px 18px -10px rgba(229,72,58,.8),inset 0 1px 0 rgba(255,255,255,.12)}
+.tab[aria-selected="true"] svg{filter:none;color:#ff6a58}
+.tab:active{transform:translateY(2px)}
+
+/* chips de secciones, segmentados */
+.chip{background:linear-gradient(180deg,#2a2e39,#1f222b);box-shadow:0 3px 0 var(--e3),var(--hi3);transition:transform .08s,box-shadow .08s}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--e3)}
+.chip[aria-pressed="true"]{background:linear-gradient(180deg,#f0604f,#d63a2c);box-shadow:0 3px 0 #8f241b,inset 0 1px 0 rgba(255,255,255,.25)}
+.seg{background:#0d0e13;box-shadow:inset 0 2px 6px rgba(0,0,0,.65)}
+.seg button[aria-selected="true"]{background:linear-gradient(180deg,#3a2c18,#2a2012);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,166,46,.55),0 3px 0 #050506,inset 0 1px 0 rgba(255,255,255,.1)}
+
+/* filas, proveedores, ventas */
+.arow{background:linear-gradient(180deg,#1d2029,#16181f);border-color:rgba(255,255,255,.07);box-shadow:0 3px 0 var(--e3),var(--hi3)}
+.supp{background:linear-gradient(180deg,#1e212b,#15171e);box-shadow:0 4px 0 var(--e3),0 16px 26px -18px rgba(0,0,0,.95),var(--hi3)}
+.vt-row{background:linear-gradient(180deg,#1d2029,#16181f);border-color:rgba(255,255,255,.07);box-shadow:0 3px 0 var(--e3),var(--hi3);overflow:visible}
+.vt-row.open{box-shadow:0 3px 0 var(--e3),0 0 0 1px rgba(255,166,46,.35),var(--hi3)}
+.vt-tot,.ar-q{text-shadow:0 1px 0 rgba(255,182,72,.45),0 2px 0 rgba(120,70,10,.7)}
+.drop{background:radial-gradient(120% 90% at 50% 0%,rgba(255,166,46,.06),rgba(0,0,0,.25));box-shadow:inset 0 3px 10px rgba(0,0,0,.5)}
+.drop-ic,.vz-ic,.sv-ic{background:linear-gradient(160deg,rgba(255,180,80,.28),rgba(255,140,30,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.55)}
+.pill{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 1px 0 rgba(0,0,0,.5)}
+.dlg-card{box-shadow:0 8px 0 var(--e3),0 40px 80px -20px rgba(0,0,0,.95),var(--hi3)}
+.toast{box-shadow:0 4px 0 var(--e3),0 18px 30px -12px rgba(0,0,0,.9),var(--hi3)}
+@media (prefers-reduced-motion:reduce){.btn,.tab,.chip{transition:none}}
+#scan{box-shadow:none;background-color:transparent}
+.pay button{background:linear-gradient(180deg,#262a34,#1c1f27);box-shadow:0 3px 0 var(--e3),var(--hi3);transition:transform .08s,box-shadow .08s}
+.pay button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--e3)}
+.pay button[aria-pressed="true"]{background:linear-gradient(180deg,rgba(229,72,58,.3),rgba(229,72,58,.12));box-shadow:inset 0 0 0 1px rgba(229,72,58,.65),0 3px 0 #5e1811,inset 0 1px 0 rgba(255,255,255,.12)}
+.sctools{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:640px){.sctools{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body.caja3[data-view="caja"] .sctools .btn.sct span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* artículo nuevo (alta rápida) */
+.ar3-top{display:flex;gap:12px;align-items:flex-start;margin:-2px 0 12px}
+.ar3-top p{margin:2px 0 0}
+.ar3-ic{width:46px;height:46px;flex:none;border-radius:14px;display:grid;place-items:center;color:#ffbf66;background:linear-gradient(160deg,rgba(255,180,80,.3),rgba(255,140,30,.08));box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.35),0 4px 0 rgba(0,0,0,.55)}
+.ar3-ic svg{width:24px;height:24px}
+.ar3{display:flex;flex-direction:column;gap:10px}
+.ar3 .field{margin:0}
+.ar3-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ar3-gan{padding:8px 12px;border-radius:10px;background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25);font-size:13px;color:#bff0cf}
+.ar3-gan b{color:#fff}
+.ar3-v{font-size:14px}
+.scalta3{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,#2a2114,#1e1810);border:1px solid rgba(255,166,46,.35);box-shadow:0 3px 0 #07080b,inset 0 1px 0 rgba(255,255,255,.07)}
+.scalta3 b{display:block;color:#fff}.scalta3 span{font-size:12.5px;color:var(--muted)}
+.gmas{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;align-items:center;text-align:center;padding:14px;border-radius:14px;border:1px dashed rgba(255,166,46,.35);background:rgba(255,166,46,.04);font-size:13px;color:var(--muted)}
+.gmas b{color:#fff;font-size:14px}
+.ar3-2>.field{min-width:0}
+.ar3 input{width:100%;box-sizing:border-box;min-width:0}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -3068,7 +3153,7 @@ function onCodigo(raw,origen){
  if(origen==="cam"){const seguido=code===sc.last&&now-sc.lastSeen<900;sc.lastSeen=now;if(seguido)return}
  sc.last=code;sc.lastT=now;sc.code=code;sc.cands=[];sc.pendiente=null;
  const p=buscarCodigo(code);
- if(!p){sc.prod=null;sc.msg=`El código ${code} no está cargado en Mise.`;try{beep()}catch(e){}flash("miss");renderSc();return}
+ if(!p){sc.prod=null;sc.msg=`El código ${code.length>30?code.slice(0,30)+"…":code} no está cargado en Mise.`;try{beep()}catch(e){}flash("miss");renderSc();return}
  elegir(p,origen);
 }
 function elegir(p,origen){
@@ -3186,7 +3271,7 @@ function renderSc(){
   ${sc.prod?prodHTML(sc.prod):""}
   ${!sc.prod&&sc.msg?`<div class="scmsg">${esc(sc.msg)}</div>`:""}
   ${sc.cands.length?`<div class="sccands">${sc.cands.map(p=>`<button class="btn" type="button" data-sc="pick" data-id="${p.id}">${esc(p.n)} · ${fmt(p.p)}</button>`).join("")}</div>`:""}
-  ${!sc.prod&&sc.code&&/^\d{6,14}$/.test(sc.code)&&!sc.aiBusy?`<form class="scalta" id="scalta" novalidate><b>Darlo de alta con el código ${esc(sc.code)}</b><div class="scalta-f"><input id="alta-n" placeholder="Nombre" aria-label="Nombre del producto"><input id="alta-p" type="number" inputmode="numeric" min="1" placeholder="Precio venta" aria-label="Precio de venta"><input id="alta-c" type="number" inputmode="numeric" min="0" placeholder="Costo" aria-label="Costo"></div><p class="err" id="alta-err" role="alert"></p><button class="btn primary" type="submit">Guardar producto</button></form>`:""}
+  ${!sc.prod&&sc.code&&sc.code.length>=4&&!sc.aiBusy&&!sc.cands.length?`<div class="scalta3"><div><b>¿Lo agregás ahora?</b><span>Código ${esc(sc.code.length>30?sc.code.slice(0,30)+"…":sc.code)} · ponés nombre y precio y queda guardado</span></div><button class="btn primary" type="button" data-sc="alta">+ Agregar artículo</button></div>`:""}
  </div>
  ${sc.modo==="vender"?`<div class="sccart"><span>${n} ${n===1?"producto":"productos"} en el ticket</span><b class="mono">${fmt(tot)}</b><button class="btn primary" type="button" data-sc="cobrar">Ir a cobrar</button></div>`:""}`;
  const w=$("scvidwrap");let vid=v;if(!vid){vid=document.createElement("video");vid.id="scvideo";vid.setAttribute("playsinline","");vid.muted=true;vid.autoplay=true}w.appendChild(vid);if(keep&&vid.paused){try{vid.play()}catch(e){}}
@@ -3202,6 +3287,7 @@ document.addEventListener("click",e=>{
  const b=e.target.closest("[data-sc]");if(!b||!$("scdlg").contains(b))return;const a=b.dataset.sc;
  if(a==="modo"){sc.modo=b.dataset.m;sc.pendiente=null;renderSc()}
  else if(a==="pick"){const p=PRODUCTS.find(x=>x.id===+b.dataset.id);if(p)elegir(p,"lista")}
+ else if(a==="alta"&&window.nmAltaRapida){window.nmAltaRapida(sc.code,{vender:sc.modo==="vender",listo:(p,v)=>{sc.prod=p;sc.msg="";sc.last=sc.code;sc.lastSeen=Date.now();if(v)sc.leidos++;renderSc()}})}
  else if(a==="cobrar"){cerrarLector();try{$("cobrar").focus();$("cobrar").scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}}
 });
 document.addEventListener("submit",e=>{
@@ -3787,7 +3873,10 @@ NM.foto=foto;
 function encolar(t,d){if(!NM.neg)return;const q=LS.get(kOut(),[]);q.push({id:uuid(),t,d,ts:Date.now()});if(!LS.set(kOut(),q))console.warn("No se pudo guardar la cola");estado()}
 NM.encolar=encolar;
 const GRANDE=1e11;
-function nuevoPid(){return Date.now()*100+Math.floor(Math.random()*100)}
+let ultPid=0;
+/* ids únicos aunque se creen miles en el mismo milisegundo (importación de Excel) */
+function nuevoPid(){let id=Date.now()*100+Math.floor(Math.random()*100);if(id<=ultPid)id=ultPid+1;ultPid=id;return id}
+NM.nuevoPid=nuevoPid;
 function remapear(viejo,nuevo){const p=PRODUCTS.find(x=>x.id===viejo);if(!p)return;p.id=nuevo;
  Object.keys(stock).forEach(b=>{if(viejo in stock[b]){stock[b][nuevo]=stock[b][viejo];delete stock[b][viejo]}});
  LOTS.forEach(l=>{if(l.id===viejo)l.id=nuevo});cart.forEach(x=>{if(x.id===viejo)x.id=nuevo});
@@ -4462,6 +4551,79 @@ function layoutCaja(){const vc=$("v-caja"),tp=$("ticketPanel");if(!vc||!tp||!MQ3
 if(MQ3){layoutCaja();(MQ3.addEventListener?MQ3.addEventListener("change",layoutCaja):MQ3.addListener(layoutCaja))}
 /* que la vista de caja nunca quede corrida hacia abajo */
 {const v=document.querySelector(".views");if(v)v.addEventListener("scroll",()=>{if(document.body.dataset.view==="caja"&&window.innerWidth>=1024&&v.scrollTop)v.scrollTop=0})}
+
+/* ---------- alta rápida: escanear un artículo que no está cargado y darlo de alta en el momento ---------- */
+let ultId=0;window.nmNuevoId=()=>{if(NM.nuevoPid)return NM.nuevoPid();let id=Date.now()*100+Math.floor(Math.random()*100);if(id<=ultId)id=ultId+1;ultId=id;return id};
+window.nmCodigoInterno=()=>{let m=0;PRODUCTS.forEach(p=>{const b=String(p.bc||"");if(/^200\d{10}$/.test(b))m=Math.max(m,+b.slice(3))});return "200"+String(m+1).padStart(10,"0")};
+const limpiaCod=c=>String(c||"").trim().replace(/\s+/g,"").slice(0,80);
+const pareceCodigo=q=>{const t=String(q||"").trim();return /^\d{4,14}$/.test(t)||(/^\S{6,80}$/.test(t)&&/\d/.test(t)&&!/^[a-záéíóúñ]+$/i.test(t))};
+async function nombrePorCodigo(code){if(!/^\d{8,14}$/.test(code))return "";
+ try{if(typeof DEMO_DB!=="undefined"&&DEMO_DB[code])return DEMO_DB[code].n}catch(e){}
+ try{const ac=new AbortController();const t=setTimeout(()=>ac.abort(),3500);
+  const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_es,brands,quantity`,{signal:ac.signal});clearTimeout(t);if(!r.ok)return "";
+  const j=await r.json();const p=j&&j.product;if(!p)return "";const n=(p.product_name_es||p.product_name||"").trim();if(!n)return "";
+  const marca=String(p.brands||"").split(",")[0].trim();const q=String(p.quantity||"").trim();
+  return [n,marca&&!n.toLowerCase().includes(marca.toLowerCase())?marca:"",q&&!n.includes(q)?q:""].filter(Boolean).join(" ").slice(0,60)}catch(e){return ""}}
+function guardarArticulo(d){const n=String(d.n||"").trim(),p=Math.round(+d.p||0),c=Math.round(+d.c||0),st=Math.max(0,Math.round(+d.st||0));const bc=limpiaCod(d.bc)||window.nmCodigoInterno();
+ if(n.length<2)return {err:"Escribí el nombre del artículo."};if(!(p>0))return {err:"Poné el precio de venta."};if(c<0)return {err:"El costo no puede ser negativo."};if(c>p)return {err:"El costo es mayor que el precio de venta. Revisalo."};
+ if(PRODUCTS.some(x=>x.bc===bc))return {err:"Ese código ya está cargado."};
+ const id=window.nmNuevoId();const min=Math.max(2,Math.round(st/3)||5);
+ const np={id,n:n.slice(0,60),bc,r:String(d.r||"").trim().slice(0,30)||"Varios",p,min,c:c>0?c:Math.round(p*.65/10)*10,s:"Sin proveedor",w:Math.max(5,Math.round(min*1.5))};
+ PRODUCTS.push(np);BRANCHES.forEach(b=>{stock[b][id]=b===branch?st:0});
+ try{afterCatalog()}catch(e){try{renderGrid()}catch(_){}}try{NM.audit&&NM.audit("alta_producto",{n:np.n,bc,p})}catch(e){}
+ return {p:np}}
+window.nmGuardarArticulo=guardarArticulo;
+function altaRapida(code,opt){opt=opt||{};code=limpiaCod(code);
+ const rubros=[...new Set(PRODUCTS.map(p=>p.r).concat(["Bebidas","Golosinas","Almacén","Limpieza","Varios"]))];
+ const d=dialogo("Artículo nuevo",`<div class="ar3-top"><span class="ar3-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8 8v8M11 8v8M14 8v8M17 8v8"/></svg></span><div><b>${code?"Este código no está cargado":"Cargá un artículo nuevo"}</b><p class="hint">${code?"Completá nombre y precio y queda guardado para siempre. La próxima vez que lo escanees, entra directo.":"Si no tiene código te armamos uno interno."}</p></div></div>
+ <form id="ar3" class="ar3" novalidate>
+  <div class="field"><label class="label" for="ar3-bc">Código</label><input id="ar3-bc" value="${E(code)}" placeholder="Sin código: se crea uno" autocomplete="off" inputmode="text"></div>
+  <div class="field"><label class="label" for="ar3-n">Nombre del artículo</label><input id="ar3-n" maxlength="60" placeholder="Ej: Alfajor triple de chocolate" autocomplete="off"><small class="hint" id="ar3-busca"></small></div>
+  <div class="ar3-2"><div class="field"><label class="label" for="ar3-p">Precio de venta</label><input id="ar3-p" type="number" inputmode="numeric" min="1" step="1" placeholder="$"></div>
+   <div class="field"><label class="label" for="ar3-c">Costo (opcional)</label><input id="ar3-c" type="number" inputmode="numeric" min="0" step="1" placeholder="$"></div></div>
+  <div class="ar3-gan" id="ar3-gan" hidden></div>
+  <div class="ar3-2"><div class="field"><label class="label" for="ar3-r">Rubro</label><input id="ar3-r" list="ar3-rl" placeholder="Varios" autocomplete="off"><datalist id="ar3-rl">${rubros.map(r=>`<option value="${E(r)}">`).join("")}</datalist></div>
+   <div class="field"><label class="label" for="ar3-st">Stock en ${E(branch)}</label><input id="ar3-st" type="number" inputmode="numeric" min="0" step="1" placeholder="0"></div></div>
+  ${opt.vender!==false?`<label class="avchk ar3-v"><input type="checkbox" id="ar3-v" checked> Sumarlo al ticket que estoy cobrando</label>`:""}
+  <p class="err" id="ar3-err" role="alert"></p>
+  <div class="pf-act"><button class="btn" type="button" data-nmx>Cancelar</button><button class="btn primary" type="submit">Guardar artículo</button></div>
+ </form>`,{alCerrar:opt.alCerrar});
+ const $d=id=>d.querySelector("#"+id);
+ setTimeout(()=>{const n=$d("ar3-n");const i=$d(!code?"ar3-bc":n&&n.value?"ar3-p":"ar3-n");if(i)i.focus()},60);
+ const gan=()=>{const p=+$d("ar3-p").value,c=+$d("ar3-c").value,g=$d("ar3-gan");if(p>0&&c>0&&c<=p){g.hidden=false;g.innerHTML=`Ganás <b>${fmt(p-c)}</b> por unidad · ${Math.round((p-c)/p*100)}% del precio`}else g.hidden=true};
+ $d("ar3-p").addEventListener("input",gan);$d("ar3-c").addEventListener("input",gan);
+ if(code&&/^\d{8,14}$/.test(code)){const b=$d("ar3-busca");b.textContent="Buscando el nombre por el código…";nombrePorCodigo(code).then(n=>{const i=$d("ar3-n");if(!i)return;if(n&&!i.value){i.value=n;b.textContent="Encontramos el nombre. Revisalo y poné el precio.";const pp=$d("ar3-p");if(pp)pp.focus()}else b.textContent=""})}
+ $d("ar3").addEventListener("submit",e=>{e.preventDefault();
+  const r=guardarArticulo({bc:$d("ar3-bc").value,n:$d("ar3-n").value,p:$d("ar3-p").value,c:$d("ar3-c").value,r:$d("ar3-r").value,st:$d("ar3-st").value});
+  if(r.err){$d("ar3-err").textContent=r.err;return}
+  const vender=$d("ar3-v")&&$d("ar3-v").checked;cerrarDlg();
+  if(vender){try{scan(r.p)}catch(e){}}
+  toast(`${r.p.n} guardado${vender?" y sumado al ticket":""}.`);if(opt.listo)opt.listo(r.p,vender)})}
+window.nmAltaRapida=altaRapida;
+/* en la caja: si el código no está cargado, ofrece darlo de alta (antes solo avisaba) */
+{const f=$("scanform");if(f)f.addEventListener("submit",e=>{const q=$("scan").value.trim();if(!q)return;const ql=q.toLowerCase();
+ const code=window.codigoDe?window.codigoDe(q):q;
+ const existe=(window.buscarCodigo&&window.buscarCodigo(code))||PRODUCTS.find(p=>p.bc===ql)||PRODUCTS.find(p=>p.n.toLowerCase().includes(ql));
+ if(existe)return;e.preventDefault();e.stopImmediatePropagation();$("scan").value="";
+ if(pareceCodigo(code)){try{beep()}catch(_){}altaRapida(code,{alCerrar:()=>{const s=$("scan");if(s&&document.body.dataset.view==="caja")s.focus()}})}
+ else{dialogo("No lo encontramos",`<p class="hint">No hay ningún artículo que se llame «${E(q.slice(0,40))}».</p><div class="pf-act"><button class="btn" type="button" data-nmx>Cerrar</button><button class="btn primary" type="button" data-nm="altanombre" data-n="${E(q.slice(0,60))}">Cargarlo como artículo nuevo</button></div>`)}},true)}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-nm]");if(!b)return;const a=b.dataset.nm;
+ if(a==="altanombre"){const n=b.dataset.n||"";cerrarDlg();setTimeout(()=>{altaRapida("",{});const i=document.getElementById("ar3-n");if(i){i.value=n;const p=document.getElementById("ar3-p");if(p)p.focus()}},30)}
+ else if(a==="altaart"){altaRapida(b.dataset.code||"",{vender:b.dataset.vender!=="0"})}
+ else if(a==="plantilla"){plantillaExcel()}});
+
+/* ---------- plantilla de Excel para cargar miles de artículos de una vez ---------- */
+async function plantillaExcel(){toast("Armando la plantilla…");try{await cargar(()=>!!window.XLSX,XLSX_URL)}catch(e){toast("No se pudo cargar el generador de Excel. Revisá internet.");return}
+ const filas=[["Producto","Código de barras","Rubro","Precio de venta","Costo","Stock","Mínimo","Proveedor"],
+  ["Coca-Cola 500 ml","7790895000997","Bebidas",1900,1150,48,12,"Bebidas del Sur"],
+  ["Alfajor triple chocolate","7790040377806","Golosinas",950,600,60,20,"Distribuidora Golomax"],
+  ["Pan lactal 550 g","","Almacén",2600,1800,10,4,""]];
+ const ws=XLSX.utils.aoa_to_sheet(filas);ws["!cols"]=[{wch:34},{wch:18},{wch:14},{wch:15},{wch:10},{wch:8},{wch:9},{wch:24}];
+ const ay=XLSX.utils.aoa_to_sheet([["Cómo completar la plantilla"],[""],["1. Una fila por artículo. Borrá los 3 ejemplos."],["2. Obligatorio: Producto y Precio de venta. Lo demás es opcional."],["3. Si no tiene código de barras, dejalo vacío: Mise le crea uno interno."],["4. Si el código ya existe en Mise, se actualizan precio, costo y stock."],["5. El stock se carga en la sucursal que tengas elegida al importar."],["6. Podés pegar listas de miles de artículos: se importan todas juntas."]]);ay["!cols"]=[{wch:80}];
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Artículos");XLSX.utils.book_append_sheet(wb,ay,"Instrucciones");
+ const out=XLSX.write(wb,{bookType:"xlsx",type:"array"});const blob=new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="plantilla-articulos-nika-mise.xlsx";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast("Plantilla descargada.")}
+window.nmPlantilla=plantillaExcel;
 
 /* ---------- arranque ---------- */
 ponerAyuda();ponerPantalla();ponerInstalar();ponerChipCuenta();
