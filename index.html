@@ -2663,6 +2663,79 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
 @media (min-width:1500px){.pos{grid-template-columns:minmax(0,1fr) 470px}}
 @media (min-width:1800px){.pos{grid-template-columns:minmax(0,1fr) 520px}}
 
+/* ===== Escritorio: la caja entra entera en la pantalla, sin bajar ===== */
+@media (min-width:1024px) and (min-height:560px){
+ body[data-view="caja"]{overflow:hidden}
+ body[data-view="caja"] .app{height:100vh;min-height:0;overflow:hidden}
+ body[data-view="caja"] .main{height:100vh;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+ body[data-view="caja"] .bar{flex:none}
+ body[data-view="caja"] .views{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding-top:12px;padding-bottom:12px;overflow:hidden}
+ body[data-view="caja"] #v-caja{flex:1 1 auto;min-height:0;grid-template-rows:minmax(0,1fr);align-items:stretch;gap:14px}
+ body[data-view="caja"] .emp3d{flex:none;margin-bottom:10px;padding:8px 18px 10px;border-radius:14px}
+ body[data-view="caja"] .emp3d-k,body[data-view="caja"] .emp3d-by{display:none}
+ body[data-view="caja"] .emp3d-n{font-size:28px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;line-height:1.15!important}
+ body[data-view="caja"] .emp3d-s{margin-top:4px;font-size:11.5px}
+ body[data-view="caja"] .emp3d-logo{width:44px;height:44px;border-radius:10px;padding:3px}
+ body[data-view="caja"] .nmtrial{flex:none;margin-bottom:8px;padding:6px 12px;font-size:12.5px}body[data-view="caja"] .nmtrial .btn{min-height:30px}
+ body[data-view="caja"] .col-scan{display:flex;flex-direction:column;min-height:0;gap:10px}
+ body[data-view="caja"] .scanzone{flex:none;padding:12px 16px 14px}
+ body[data-view="caja"] .sz-head{margin-bottom:6px}
+ body[data-view="caja"] .sctools{margin-top:8px}body[data-view="caja"] .sctools .btn.sct{min-height:40px;padding:6px 10px}
+ body[data-view="caja"] .libres:not(.pregunta){margin-top:8px;padding:8px 10px}body[data-view="caja"] .lib-head{margin-bottom:6px}
+ body[data-view="caja"] .libres .lchip{min-height:56px;padding:6px 4px;gap:3px}body[data-view="caja"] .libres .lchip i{width:30px;height:30px}body[data-view="caja"] .libres .lchip i svg{width:18px;height:18px}
+ body[data-view="caja"] .lastscan{margin-top:8px;padding:8px 14px;min-height:0}
+ body[data-view="caja"] .cats{flex:none}
+ body[data-view="caja"] #grid{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px 8px 12px 0;align-content:start;grid-auto-rows:max-content;scrollbar-width:thin}
+ body[data-view="caja"] #ticketPanel,body[data-view="caja"] #cobroPanel{display:flex;flex-direction:column;min-height:0;height:100%;overflow-y:auto;overflow-x:hidden;gap:10px;scrollbar-width:thin}
+ body[data-view="caja"] #ticketPanel>.tk-head,body[data-view="caja"] #cobroPanel>.tk-head{flex:none}
+ body[data-view="caja"] #lines{flex:1 1 120px;min-height:110px;max-height:none;overflow-y:auto}
+ body[data-view="caja"] .total{flex:none;padding:10px 14px}body[data-view="caja"] .total .big{font-size:40px}
+ body[data-view="caja"] #pay{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;flex:none}
+ body[data-view="caja"] #pay button{grid-column:auto!important;padding:7px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;font-size:12.5px}
+ body[data-view="caja"] #pay button small{display:none}body[data-view="caja"] #pay button svg{width:18px;height:18px;margin:0}
+ body[data-view="caja"] .neto{flex:none}
+ body[data-view="caja"] #ticketPanel .field,body[data-view="caja"] #cobroPanel .field{flex:none;margin:0}
+ body[data-view="caja"] .nmcash{gap:8px;margin-top:6px}
+ body[data-view="caja"] .nmsug{min-height:42px;padding:5px 10px}body[data-view="caja"] .nmsug b{font-size:14px}
+ body[data-view="caja"] .nmbill{min-height:40px}
+ body[data-view="caja"] .nmc-vuelto.ok,body[data-view="caja"] .nmc-vuelto.falta,body[data-view="caja"] .nmc-vuelto.justo{padding:10px 14px}
+ body[data-view="caja"] .nmc-n{font-size:28px}
+ body[data-view="caja"] #cobrar{position:sticky;bottom:0;z-index:5;flex:none;margin-top:auto;box-shadow:0 -14px 20px -6px rgba(10,11,15,.95),0 6px 0 #9c2a20}
+}
+/* 3 columnas: productos · ticket · cobro */
+@media (min-width:1280px) and (min-height:560px){
+ body.caja3[data-view="caja"] #v-caja{grid-template-columns:minmax(0,1fr) 340px 360px}
+ body.caja3[data-view="caja"] #ticketPanel{overflow:hidden}
+ body.caja3[data-view="caja"] #lines{flex:1 1 auto;min-height:0}
+ body.caja3[data-view="caja"] #ticketPanel .total{margin-top:auto}
+ body.caja3[data-view="caja"] .line.tk3d{grid-template-columns:40px minmax(0,1fr) auto;grid-template-areas:"th nm sub" "th qty qty";row-gap:6px;padding:8px}
+ body.caja3[data-view="caja"] .line.tk3d .tk-th{grid-area:th;width:40px;height:40px;align-self:start}body.caja3[data-view="caja"] .line.tk3d .nm{grid-area:nm}
+ body.caja3[data-view="caja"] .line.tk3d .sub{grid-area:sub;align-self:start;font-size:16px;min-width:0}body.caja3[data-view="caja"] .line.tk3d .qty{grid-area:qty;justify-self:start}
+ body.caja3[data-view="caja"] .line.tk3d .qty button{width:30px;height:30px}
+ body.caja3[data-view="caja"] .total .big{font-size:36px}
+}
+@media (min-width:1600px) and (min-height:560px){body.caja3[data-view="caja"] #v-caja{grid-template-columns:minmax(0,1fr) 400px 420px}
+ body.caja3[data-view="caja"] .line.tk3d{grid-template-columns:44px minmax(0,1fr) auto auto;grid-template-areas:none}
+ body.caja3[data-view="caja"] .line.tk3d>*{grid-area:auto!important}}
+/* pantallas bajitas (notebooks de 768 px) */
+@media (min-width:1024px) and (max-height:820px){
+ body[data-view="caja"] .emp3d-s{display:none}
+ body[data-view="caja"] .libres .lchip{min-height:46px}body[data-view="caja"] .lib-s{display:none}
+ body[data-view="caja"] .nmc-sug{display:none}
+ body[data-view="caja"] .neto{display:none}
+ body[data-view="caja"] .nmc-dar{display:none}
+}
+@media (min-width:1280px) and (max-width:1599px) and (min-height:560px){body.caja3[data-view="caja"] #v-caja{grid-template-columns:minmax(0,1fr) 310px 340px}}
+@media (min-width:1024px) and (max-height:820px){
+ body[data-view="caja"] .lastscan,body[data-view="caja"] .laser,body[data-view="caja"] .lib-head,body[data-view="caja"] .sz-head .hint{display:none}
+ body[data-view="caja"] .scanzone{padding:8px 12px 10px}
+ body[data-view="caja"] .sctools{margin-top:6px}body[data-view="caja"] .sctools .btn.sct{min-height:34px;font-size:12.5px}
+ body[data-view="caja"] .libres:not(.pregunta){margin-top:6px;padding:6px 8px}
+ body[data-view="caja"] .libres .lchip{min-height:40px;flex-direction:row;gap:6px}body[data-view="caja"] .libres .lchip i{width:26px;height:26px}body[data-view="caja"] .libres .lchip i svg{width:16px;height:16px}
+ body[data-view="caja"] .emp3d{padding:5px 14px 6px;margin-bottom:8px}body[data-view="caja"] .emp3d-n{font-size:22px!important}
+ body[data-view="caja"] .views{padding-top:8px;padding-bottom:8px}
+}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -4315,6 +4388,18 @@ function ponerPantalla(){const ctx=document.querySelector(".bar .ctx");if(!ctx||
   b.innerHTML=(on?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>')+`<span>${on?"Salir":"Pantalla completa"}</span>`};
  b.addEventListener("click",()=>{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>toast("Tu navegador no deja usar pantalla completa acá. Probá con F11."))});
  document.addEventListener("fullscreenchange",pinta);pinta();ctx.insertBefore(b,$("nmayuda")||ctx.querySelector(".status"))}
+
+
+/* ---------- computadora: caja en 3 columnas (productos · ticket · cobro), todo a la vista ---------- */
+const MQ3=window.matchMedia?matchMedia("(min-width:1280px) and (min-height:560px)"):null;
+function layoutCaja(){const vc=$("v-caja"),tp=$("ticketPanel");if(!vc||!tp||!MQ3)return;let cp=$("cobroPanel");const tres=MQ3.matches;
+ const nodos=()=>[$("neto"),$("pay"),$("cashfield"),$("dni")&&$("dni").closest(".field"),$("cobrar")].filter(Boolean);
+ if(tres&&!cp){cp=document.createElement("aside");cp.id="cobroPanel";cp.className="panel ticket cobro";cp.setAttribute("aria-label","Cobro");
+  cp.innerHTML='<div class="tk-head"><div><h2>Cobro</h2><span class="hint">Medio de pago y vuelto</span></div></div>';nodos().forEach(n=>cp.appendChild(n));tp.after(cp);document.body.classList.add("caja3")}
+ else if(!tres&&cp){nodos().forEach(n=>tp.appendChild(n));cp.remove();document.body.classList.remove("caja3")}}
+if(MQ3){layoutCaja();(MQ3.addEventListener?MQ3.addEventListener("change",layoutCaja):MQ3.addListener(layoutCaja))}
+/* que la vista de caja nunca quede corrida hacia abajo */
+{const v=document.querySelector(".views");if(v)v.addEventListener("scroll",()=>{if(document.body.dataset.view==="caja"&&window.innerWidth>=1024&&v.scrollTop)v.scrollTop=0})}
 
 /* ---------- arranque ---------- */
 ponerAyuda();ponerPantalla();ponerInstalar();ponerChipCuenta();
