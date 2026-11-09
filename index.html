@@ -2736,6 +2736,55 @@ html.nm-real [data-act="fx-qrsample"],html.nm-real [data-act="fx-sample"],html.n
  body[data-view="caja"] .views{padding-top:8px;padding-bottom:8px}
 }
 
+/* ---------- avisos en 3D ---------- */
+.avres{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:2px 0 10px}
+.avt{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px 9px;border:1px solid rgba(255,255,255,.08);border-radius:14px;cursor:pointer;text-align:left;color:#eeeae2;
+ background:linear-gradient(180deg,#232733,#191c25);box-shadow:0 4px 0 #0a0b0f,0 12px 18px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07);transition:transform .12s,box-shadow .12s}
+.avt::before{content:"";position:absolute;left:10px;right:10px;top:0;height:3px;border-radius:0 0 4px 4px;background:var(--c,#f0a63a)}
+.avt.t-venc,.avt.t-out{--c:#e5483a}.avt.t-pronto,.avt.t-low{--c:#f0a63a}
+.avt-n{font:900 26px/1 var(--f-display);color:#fff;text-shadow:0 2px 0 var(--c),0 4px 8px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
+.avt-l{font:700 11.5px var(--f-body);color:var(--muted);letter-spacing:.02em}
+.avt:hover:not(:disabled){transform:translateY(-1px)}
+.avt:active:not(:disabled),.avt.on{transform:translateY(3px);box-shadow:0 1px 0 #0a0b0f,inset 0 0 0 1px var(--c)}
+.avt.on{background:linear-gradient(180deg,#2a2e3b,#1e212b)}.avt.on .avt-l{color:#fff}
+.avt:disabled{opacity:.45;cursor:default}
+.avt:disabled .avt-n{text-shadow:none;color:var(--muted)}
+.avriesgo{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px;padding:9px 14px;border-radius:12px;background:linear-gradient(90deg,rgba(229,72,58,.14),rgba(240,166,58,.08));border:1px solid rgba(229,72,58,.28);font-size:13px;color:#e9d9cf}
+.avriesgo b{white-space:nowrap;font:900 18px var(--f-display);color:#fff;text-shadow:0 1px 0 #ffb648,0 2px 0 #c07412}
+.avver{align-self:flex-start;border:0;background:none;color:#ffbf66;font:700 13px var(--f-body);cursor:pointer;padding:2px 2px 4px}
+.avlist{gap:10px}
+.avitem.av3d{display:grid;grid-template-columns:56px minmax(0,1fr) 64px;gap:12px;align-items:start;padding:12px;border:1px solid rgba(255,255,255,.08);border-left:0;border-radius:16px;position:relative;overflow:hidden;
+ background:linear-gradient(180deg,#1f232d,#171a22);box-shadow:0 4px 0 #0a0b0f,0 14px 22px -14px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.06)}
+.avitem.av3d::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--c),color-mix(in srgb,var(--c) 45%,#000))}
+.avitem.av3d.crit{--c:#e5483a}.avitem.av3d.warn{--c:#f0a63a}
+.avitem.av3d.leido{opacity:.82}
+.av-th{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(150deg,#fdf7ea,#e8ddc8);box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 3px 0 color-mix(in srgb,var(--c) 70%,#000)}
+.av-th .etq-obj{height:60px;margin:0;transform:scale(.68);transform-origin:50% 60%}
+.av-th .po-floor{display:none}
+.av-cash{font:900 26px var(--f-display);color:#c07412}
+.av-c{display:flex;flex-direction:column;gap:5px;min-width:0}
+.av3d .avi-h{gap:8px;flex-wrap:wrap}
+.av3d .avi-h b{font-size:14.5px;line-height:1.3;flex:1 1 160px}
+.av3d .avi-h .pill{flex:none}
+.av-plata{align-self:flex-start;font:800 12px var(--f-body);color:#ffbf66;padding:2px 8px;border-radius:99px;background:rgba(240,166,58,.12);border:1px solid rgba(240,166,58,.25)}
+.av3d .avi-a{margin-top:3px;gap:7px}
+.av3d .avi-a .btn{padding:7px 11px;font-size:12.5px;font-weight:700;border:0;border-radius:10px;color:#eeeae2;background:linear-gradient(180deg,#2c313d,#20242e);box-shadow:0 3px 0 #08090c,inset 0 1px 0 rgba(255,255,255,.08);transition:transform .08s,box-shadow .08s}
+.av3d .avi-a .btn.primary{color:#fff;background:linear-gradient(180deg,#f0604f,#d63a2c);box-shadow:0 3px 0 #8f241b,inset 0 1px 0 rgba(255,255,255,.25)}
+.av3d .avi-a .btn.ok{color:#bff0cf;background:linear-gradient(180deg,#24493a,#1a382c);box-shadow:0 3px 0 #0c1d16,inset 0 1px 0 rgba(255,255,255,.08)}
+.av3d .avi-a .btn:active{transform:translateY(2px);box-shadow:0 1px 0 #08090c}
+.avm{display:flex;flex-direction:column;align-items:center;width:64px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#fdf7ea,#ebe1cd);box-shadow:0 4px 0 color-mix(in srgb,var(--c) 60%,#000),0 10px 14px -10px rgba(0,0,0,.9)}
+.avm-b{width:100%;text-align:center;padding:3px 2px;font:800 9.5px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:#fff;background:var(--c)}
+.avm-n{font:900 26px/1.05 var(--f-display);color:#1b1d24;padding-top:4px;font-variant-numeric:tabular-nums}
+.avm-n.chico{font-size:19px;padding-top:7px}
+.avm-f{font:700 10.5px var(--f-body);color:#6b6455;padding:1px 0 5px;min-height:14px}
+@media (max-width:520px){
+ .avres{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .avitem.av3d{grid-template-columns:44px minmax(0,1fr) 52px;gap:10px;padding:10px}
+ .av-th{width:44px;height:44px;border-radius:11px}.av-th .etq-obj{transform:scale(.55)}
+ .avm{width:52px}.avm-n{font-size:21px}.avm-n.chico{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){.avt,.av3d .avi-a .btn{transition:none}}
+
 </style>
 <script>
 /* ===================== AL DÍA EN MISE: avisos, facturas por foto y QR de ARCA, planes ===================== */
@@ -2761,7 +2810,7 @@ function avisos(){
   else if(l.d<=av){if(t.pronto)out.push({key:"pronto-"+i,tipo:"pronto",lot:L,ord:l.d<=2?1:2,d:l.d,title:`${p.n}: ${lotWhen(l.d).toLowerCase()}`,sub:`${l.q} u. en ${l.b}${sob>0?` · al ritmo de venta sobran unas ${sob}`:" · al ritmo de venta se llega a vender"}`})}
   else if(sob>0&&l.d<=Math.max(av*3,30)){if(t.riesgo)out.push({key:"riesgo-"+i+"-"+sob,tipo:"riesgo",lot:L,ord:3,d:l.d,title:`No llegás a vender ${sob} u. de ${p.n}`,sub:`${l.b} · ${lotWhen(l.d)} y se venden unas ${ventaDia(p).toFixed(1).replace(".",",")} por día`})}
  });
- alertsList().forEach(a=>{if(!t[a.k])return;out.push({key:"st-"+a.key,tipo:a.k,alertKey:a.key,ord:a.k==="out"?1.5:a.k==="cash"?2.5:4,d:99,title:a.k==="cash"?a.title:a.title,sub:a.sub})});
+ alertsList().forEach(a=>{if(!t[a.k])return;out.push({key:"st-"+a.key,tipo:a.k,alertKey:a.key,p:a.p,s:a.s,b:a.b,ord:a.k==="out"?1.5:a.k==="cash"?2.5:4,d:99,title:a.k==="cash"?a.title:a.title,sub:a.sub})});
  const crit=x=>x.tipo==="venc"||x.tipo==="out"||(x.tipo==="pronto"&&x.d<=2);
  out.sort((a,b)=>(crit(b)-crit(a))||a.ord-b.ord||a.d-b.d||a.title.localeCompare(b.title));
  return out.map(x=>({...x,crit:crit(x)}));
@@ -2769,19 +2818,31 @@ function avisos(){
 function badge(){const al=avisos();const vig=new Set(al.map(a=>a.key));let cambio=false;LEIDOS.forEach(k=>{if(!vig.has(k)){LEIDOS.delete(k);cambio=true}});if(cambio)saveLeidos();
  const n=al.filter(a=>!LEIDOS.has(a.key)).length;const b=$("avbadge");if(!b)return;b.textContent=n>99?"99+":String(n);b.hidden=!n;$("avbell").classList.toggle("has",n>0);$("avbell").setAttribute("aria-label",n?`Avisos, ${n} sin leer`:"Avisos");}
 function msgCambio(l){const p=l.p;return `Hola, les escribo del kiosco de ${l.b}. Tengo ${l.q} u. de ${p.n} que ${lotWhen(l.d).toLowerCase()} (${lotDate(l.d)}). ¿Me las pueden cambiar en la próxima visita? Gracias.`}
+const GRUPOS=[["venc","Vencidos",["venc"],"out"],["pronto","Por vencer",["pronto","riesgo"],"low"],["out","Sin stock",["out"],"out"],["low","Stock bajo",["low","cash"],"low"]];
+let AVF="todos";
+function medidor(a){const L=a.lot;let band,num,foot;
+ if(L){const d=L.d;if(d<0){band="Venció";num=-d;foot=-d===1?"día":"días"}else if(d===0){band="Vence";num="HOY";foot=""}else{band="Vence en";num=d;foot=d===1?"día":"días"}}
+ else if(a.tipo==="cash"){band="Caja";num="$";foot="revisar"}
+ else{band="Stock";num=a.s!=null?a.s:0;foot="u."}
+ return `<span class="avm" aria-hidden="true"><span class="avm-b">${band}</span><span class="avm-n${String(num).length>2?" chico":""}">${num}</span><span class="avm-f">${foot}</span></span>`}
 function itemAviso(a){
- const [tl,tc]=TIPOS[a.tipo]||["Aviso","low"];let act="";
+ const [tl,tc]=TIPOS[a.tipo]||["Aviso","low"];let act="";const P=a.lot?a.lot.p:a.p;
  if(a.lot){const sup=provByName(a.lot.p.s);
   if(a.tipo!=="venc")act+=`<button class="btn primary" type="button" data-av="promo" data-i="${a.lot.i}">Promo −30%</button>`;
   act+=`<button class="btn" type="button" data-av="cambio" data-i="${a.lot.i}">Pedir cambio${sup&&sup.nombre?" a "+esc(sup.nombre):""}</button>`;
-  act+=`<button class="btn" type="button" data-av="ret" data-i="${a.lot.i}">${a.tipo==="venc"?"Ya lo saqué":"Retirado"}</button>`;}
+  act+=`<button class="btn ok" type="button" data-av="ret" data-i="${a.lot.i}">${a.tipo==="venc"?"Ya lo saqué":"Retirado"}</button>`;}
  else act+=`<button class="btn" type="button" data-av="ver" data-k="${esc(a.alertKey)}">Ver qué hacer</button>`;
- return `<div class="avitem ${a.crit?"crit":"warn"}"><div class="avi-h"><b>${LEIDOS.has(a.key)?"":'<i class="avdot" title="Sin leer"></i>'}${esc(a.title)}</b><span class="pill ${tc}">${tl}</span></div><small>${esc(a.sub)}</small><div class="avi-a">${act}</div></div>`}
+ let th="";try{if(P&&window.__nmObjHTML)th=window.__nmObjHTML(P);else if(a.tipo==="cash")th='<span class="av-cash">$</span>'}catch(e){}
+ const plata=a.lot&&a.lot.p&&a.lot.p.p?`<span class="av-plata">${fmt(a.lot.q*a.lot.p.p)} en juego</span>`:"";
+ return `<div class="avitem av3d t-${a.tipo} ${a.crit?"crit":"warn"}${LEIDOS.has(a.key)?" leido":""}"><span class="av-th" aria-hidden="true">${th}</span><div class="av-c"><div class="avi-h"><b>${LEIDOS.has(a.key)?"":'<i class="avdot" title="Sin leer"></i>'}${esc(a.title)}</b><span class="pill ${tc}">${tl}</span></div><small>${esc(a.sub)}</small>${plata}<div class="avi-a">${act}</div></div>${medidor(a)}</div>`}
+function resumenAv(al){const tiles=GRUPOS.map(([id,nom,ts,c])=>{const n=al.filter(a=>ts.includes(a.tipo)).length;return `<button type="button" class="avt t-${id}${AVF===id?" on":""}" data-av="filtro" data-f="${id}"${n?"":" disabled"}><span class="avt-n">${n}</span><span class="avt-l">${nom}</span></button>`}).join("");
+ const riesgo=al.reduce((s,a)=>s+(a.lot&&a.lot.p&&a.lot.p.p?a.lot.q*a.lot.p.p:0),0);
+ return `<div class="avres">${tiles}</div>${riesgo?`<div class="avriesgo"><span>Mercadería en juego por vencimientos</span><b>${fmt(riesgo)}</b></div>`:""}`}
 function renderAvisos(){
  const al=avisos();const resumen=al.length?`${al.length} avisos. ${al.slice(0,2).map(a=>a.title).join(" · ")}`:"Todo al día.";
  $("avbody").innerHTML=`<span class="eyebrow"><i class="dot"></i>Al Día · dentro de Mise</span><h3 class="dlg-t" id="av-t">Avisos</h3>
  <div class="avtop"><p class="hint">${al.length?`${al.length} para atender, lo más urgente primero.`:"No hay nada para atender."}</p>${al.length?'<button class="btn" type="button" data-av="leido">Marcar todo como leído</button>':""}</div>
- <div class="avlist">${al.length?al.map(itemAviso).join(""):'<div class="empty">Todo al día: nada vencido, por vencer ni sin stock.</div>'}</div>
+ ${al.length?resumenAv(al):""}<div class="avlist">${al.length?(()=>{let g=GRUPOS.find(x=>x[0]===AVF);if(g&&!al.some(a=>g[2].includes(a.tipo))){AVF="todos";g=null}const v=g?al.filter(a=>g[2].includes(a.tipo)):al;return (g?`<button type="button" class="avver" data-av="filtro" data-f="todos">← Ver todos (${al.length})</button>`:"")+v.map(itemAviso).join("")})():'<div class="empty">Todo al día: nada vencido, por vencer ni sin stock.</div>'}</div>
  <details class="avcfg"><summary>Notificaciones en el celular</summary>
   <div class="avnotif"><span class="avn-ic">M</span><div><b>Nika Mise · ${esc(AVCFG.hora)}</b><p>${esc(resumen)}</p></div></div>
   <div class="field"><label class="label" for="av-hora">Hora del resumen diario</label><input id="av-hora" type="time" value="${esc(AVCFG.hora)}"></div>
@@ -2791,7 +2852,7 @@ function renderAvisos(){
  <details class="avcfg"><summary>Con cuántos días de anticipación avisar</summary><p class="note">Días antes del vencimiento, por rubro. Lo que vence rápido necesita menos días; lo seco, más.</p>
   <div class="avdias">${[...new Set(PRODUCTS.map(p=>p.r))].map(r=>`<label class="avdia"><span>${esc(r)}</span><input type="number" min="1" max="120" step="1" inputmode="numeric" data-rubro="${esc(r)}" value="${avisoDias({r})}" aria-label="Días de aviso para ${esc(r)}"> días</label>`).join("")}</div></details>`;
 }
-function openAvisos(){renderAvisos();$("avdlg").hidden=false;document.body.classList.add("dlgopen");$("avx").focus();}
+function openAvisos(){AVF="todos";renderAvisos();$("avdlg").hidden=false;document.body.classList.add("dlgopen");$("avx").focus();}
 function closeAvisos(){$("avdlg").hidden=true;document.body.classList.remove("dlgopen");badge();}
 function refrescar(){try{renderGrid()}catch(e){}try{if(!$("v-panel").hidden)renderPanel();else renderVenc()}catch(e){}try{if(!$("v-auto").hidden)renderAuto()}catch(e){}try{if(!$("v-stock").hidden)renderStock()}catch(e){}badge();}
 async function probar(){const al=avisos();const body=al.length?`${al.length} avisos. ${al[0].title}`:"Todo al día.";
@@ -2803,6 +2864,7 @@ document.addEventListener("click",e=>{
  const b=e.target.closest("[data-av]");if(!b||!$("avdlg").contains(b))return;const a=b.dataset.av;
  if(a==="leido"){avisos().forEach(x=>LEIDOS.add(x.key));saveLeidos();renderAvisos();badge();return}
  if(a==="probar"){probar();return}
+ if(a==="filtro"){AVF=AVF===b.dataset.f?"todos":b.dataset.f;renderAvisos();return}
  if(a==="ver"){closeAvisos();openAlert(b.dataset.k);return}
  const i=+b.dataset.i,l=LOTS[i];if(!l)return;const p=PRODUCTS.find(x=>x.id===l.id);const L={...l,i,p};
  if(a==="promo"){promoLots.add(i);toast(`${p.n} en promo −30% en la caja de ${l.b}`)}
